@@ -1,0 +1,57 @@
+
+<div class="main-container">
+    <div class="loading-container" *ngIf="loading">
+        <div class="spinning-loading-container"></div>
+        <div class="loading-text-container">
+            Please wait...
+        </div>
+    </div>
+    <div *ngIf="!loading && isConfirmed">
+        <div class="container"> 
+            <div class="image-container"> 
+                <img src="assets/emailConfirmation/success.png" alt="Email confirmation successfully.">
+            </div>
+            <div>
+                <div class="title-container">
+                    <h2>Email confirmed successfully</h2>
+                </div>
+                <div class="message-container">
+                    <p>
+                        Congratulations! Your email address has been successfully confirmed. You can now log in to our app and take full control of your energy usage.
+                        <br>
+                        <b>Check your email box for password.</b>
+                        <br>
+                        Welcome to the <i>ElectricAssist</i> team!
+                    </p>
+                </div>
+                <div class="button-container">
+                    <button><a (click)="goToLoginPage()">Login</a></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="!loading && !isConfirmed">
+        <div class="container"> 
+            <div class="image-container"> 
+                <img src="assets/emailConfirmation/not_confirmed.png" alt="Email confirmation failed.">
+            </div>
+            <div>
+                <div class="title-container">
+                    <h2>Failed to confirm your email address</h2>
+                </div>
+                <div class="message-container">
+                    <p>
+                        We apologize because your email address confirmation did not go as planned. It appears that <b><i>{{message}}</i></b>.
+                        <br>
+                        Please contact our app administrator to help resolve this problem.
+                        <br>
+                        <br>
+                        Sincerely, <br>
+                        The <i>ElectricAssist Team</i>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

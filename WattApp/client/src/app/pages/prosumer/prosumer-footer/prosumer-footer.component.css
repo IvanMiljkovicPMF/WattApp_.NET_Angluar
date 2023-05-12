@@ -1,0 +1,60 @@
+/* Footer */
+
+#pros {
+    background-color: #354871;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    left: 0;
+}
+
+a {
+    text-decoration: none;
+    color: white;
+    float: inherit;
+}
+
+.footer-app {
+    position: relative;
+    margin: 0px 20px 0px 20px;
+}
+
+#footerimg {
+    width: 30px;
+    margin: 5px;
+}
+
+.nav-link {
+    text-align: center;
+    width: 100%;
+    margin: 10px;
+    float: left;
+}
+
+.active {
+    margin: 10px;
+    background-color: #354871 !important;
+    color: #2fbcff;
+}
+
+a:hover {
+    background-color: #354871;
+    color: white;
+}
+
+.icon-holder {
+    display: flex;
+    justify-content: center;
+}
+
+.title {
+    font-size: 15px;
+}
+
+@media (min-width: 768px) {
+    #pros {
+        display: none;
+    }
+}

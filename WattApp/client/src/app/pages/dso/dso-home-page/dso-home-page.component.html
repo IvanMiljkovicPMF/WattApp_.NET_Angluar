@@ -1,0 +1,136 @@
+<div class="wrapper">
+    <div class="card-group">
+        <div class="bgc-white p-20 bd">
+            <div class="c-grey-900 text-center"  >
+                <div style="display: inline-block;"><h1 style=" font-weight: bolder;">Overview of {{updateUserDetail.city}}</h1></div>
+                <hr style="margin-bottom: 0;padding-bottom: 0;">
+            </div>
+            <div class="peers mT-20 fxw-nw@lg+ jc-sb ta-c gap-10">
+                <div class="peer" >
+                    <div class="c-grey-900 text-center"  >
+                        <div data-bs-toggle="tooltip" data-bs-placement="top" title="Consumption less than: 350 kWh" style="display: inline-block; cursor: pointer;font-size: 18px;"><span class="green-square" ></span> Green zone </div>
+                        <div data-bs-toggle="tooltip" data-bs-placement="top" title="Consumption between: 351 and 1600 kWh" style="display: inline-block; cursor: pointer;font-size: 18px;"><span class="blue-square"></span> Blue zone</div>
+                        <div data-bs-toggle="tooltip" data-bs-placement="top" title="Consumption more than: 1601 kWh" style="display: inline-block; cursor: pointer;font-size: 18px;"><span class="red-square" ></span> Red zone</div>
+                        </div>
+                        <app-current-power-wattmeter></app-current-power-wattmeter>
+                        <span>Current consumption</span>
+                </div>
+                <div class="peer" >
+                    <div class="c-grey-900 text-center"  >
+                        <div data-bs-toggle="tooltip" data-bs-placement="top" title="Consumption less than: 22.22 MWh" style="display: inline-block; cursor: pointer;font-size: 18px;"><span class="green-square" ></span> Green zone </div>
+                        <div data-bs-toggle="tooltip" data-bs-placement="top" title="Consumption between: 22.22 and 44.44 MWh" style="display: inline-block; cursor: pointer;font-size: 18px;"><span class="blue-square"></span> Blue zone</div>
+                        <div data-bs-toggle="tooltip" data-bs-placement="top" title="Consumption more than: 44.45 MWh" style="display: inline-block; cursor: pointer;font-size: 18px;"><span class="red-square" ></span> Red zone</div>
+                    </div>
+                        <app-consumption-today-wattmeter></app-consumption-today-wattmeter>
+                        <span>Today consumption</span>
+                </div>
+                <div class="peer" >
+                    <div class="c-grey-900 text-center"  >
+                        <div data-bs-toggle="tooltip" data-bs-placement="top" title="Consumption less than: 666.67 MWh" style="display: inline-block; cursor: pointer;font-size: 18px;"><span class="green-square" ></span> Green zone </div>
+                        <div data-bs-toggle="tooltip" data-bs-placement="top" title="Consumption between: 666.67 and 1333.33 MWh" style="display: inline-block; cursor: pointer;font-size: 18px;"><span class="blue-square"></span> Blue zone</div>
+                        <div data-bs-toggle="tooltip" data-bs-placement="top" title="Consumption more than: 1333.33 MWh" style="display: inline-block; cursor: pointer;font-size: 18px;"><span class="red-square" ></span> Red zone</div>
+                    </div>
+                        <app-consumption-month-wattmeter></app-consumption-month-wattmeter>
+                        <span>Month consumption</span>
+                </div>
+                <div class="peer" >
+                    <div class="c-grey-900 text-center"  >
+                        <div data-bs-toggle="tooltip" data-bs-placement="top" title="Consumption less than: 8000 MWh" style="display: inline-block; cursor: pointer;font-size: 18px;"><span class="green-square" ></span> Green zone </div>
+                        <div data-bs-toggle="tooltip" data-bs-placement="top" title="Consumption between: 8000 and 16000 MWh" style="display: inline-block; cursor: pointer;font-size: 18px;"><span class="blue-square"></span> Blue zone</div>
+                        <div data-bs-toggle="tooltip" data-bs-placement="top" title="Consumption more than: 16000 MWh" style="display: inline-block; cursor: pointer;font-size: 18px;"><span class="red-square" ></span> Red zone</div>
+                    </div>
+                        <app-consumption-year-wattmeter></app-consumption-year-wattmeter>
+                        <span>Year consumption</span>
+                </div>
+            </div>
+        </div>
+        <div class="numpro">
+            <div class="col-md-2 col-sm-4  tile_stats_count">
+                <span class="count_top"><i style="font-size: 20px;margin-right: 5px; " class="fa fa-user"></i>Total Prosumers in {{updateUserDetail.city}}</span>
+                <div *ngIf="loader" style="display: inline; justify-content: center;align-items: center;"><app-loader></app-loader></div>
+                <div class="count">{{numberOfProsumers}}</div>
+                <span class="count_bottom"><i class="green">10% </i> From last Week</span>
+            </div>
+            <hr style="margin: 0;">
+            <div class="col-md-2 col-sm-4  tile_stats_count">
+                <span class="count_top"><i style="font-size: 20px; margin-right: 5px; color: rgb(255, 198, 55);"class="fa fa-sun"></i>Total Production in {{updateUserDetail.city}}</span>
+                <div class="count"> {{totalProduction}} kWh </div>
+                <span class="count_bottom"><i class="green">2% </i> From last Week</span>
+            </div>    
+            <hr style="margin: 0;">
+            <div class="col-md-2 col-sm-4  tile_stats_count">
+                <span class="count_top"><i style="font-size: 20px; margin-right: 5px; color: rgb(0, 157, 255);" class="fa fa-bolt"></i>Average Production in {{updateUserDetail.city}}</span>
+                <div class="count">{{avgProduction}} kWh</div>
+                <span class="count_bottom"><i class="green"><i class="fa fa-arrow-up"></i>14% </i> From last Week</span>
+            </div>
+        </div>
+        <div class="weather">
+            <div class="weather-body">
+                <app-today></app-today>
+                <app-future></app-future>
+            </div>
+        </div> 
+        <div id="pie">
+            <div id="titlePie"><span><b>Current production for stettlement in kWh </b> <hr></span>
+            </div>
+            <div id="chart">
+                <app-pie-chart></app-pie-chart>
+            </div>
+        </div>
+        <div class="history-charts">
+            <div class="toggle-container">
+                <div class="toggle-buttons">
+                  <input type="radio" (click)="showGraph()" name="toggle" id="dashboard-btn" checked >
+                  <label for="dashboard-btn">Graphical view</label>
+                  <span class="divider"></span>
+                  <input type="radio" (click)="showTable()" name="toggle" id="devices-btn">
+                  <label for="devices-btn">Tabular view</label>
+                </div>
+            </div>
+            <ng-container *ngIf="graph">
+                <div class="chart-body">
+                    <div class="chart-buttons">
+                      <button (click)="showComponentGraph()" class="chart-button" [class.active]="compGraph">Day</button>
+                      <button (click)="showComponentGraph1()" class="chart-button"[class.active]="compGraph1">Week</button>
+                      <button (click)="showComponentGraph2()" class="chart-button"[class.active]="compGraph2">Month</button>
+                      <button (click)="showComponentGraph3()" class="chart-button"[class.active]="compGraph3">Year</button>
+                    </div>
+                  </div>
+                <div class="history-charts-body" *ngIf="compGraph">
+                    <app-line-day-chart></app-line-day-chart>
+                </div>
+                <div class="history-charts-body" *ngIf="compGraph1">
+                    <app-line-week-chart></app-line-week-chart>
+                </div>
+                <div class="history-charts-body" *ngIf="compGraph2">
+                    <app-bar-month-chart></app-bar-month-chart>
+                </div>
+                <div class="history-charts-body" *ngIf="compGraph3">
+                    <app-bar-year-chart></app-bar-year-chart>
+                </div>
+            </ng-container>
+            <ng-container *ngIf="tabelar">
+                <div class="chart-body">
+                    <div class="chart-buttons">
+                      <button (click)="showComponentGraph()" class="chart-button" [class.active]="compGraph">Day</button>
+                      <button (click)="showComponentGraph1()" class="chart-button" [class.active]="compGraph1">Week</button>
+                      <button (click)="showComponentGraph2()" class="chart-button" [class.active]="compGraph2">Month</button>
+                      <button (click)="showComponentGraph3()" class="chart-button" [class.active]="compGraph3">Year</button>
+                    </div>
+                  </div>
+                <div class="history-charts-body" *ngIf="compGraph">
+                    <app-tabelar-view></app-tabelar-view>
+                </div>
+                <div class="history-charts-body" *ngIf="compGraph1">
+                    <app-tabelar-view-by-week></app-tabelar-view-by-week>
+                </div>
+                <div class="history-charts-body" *ngIf="compGraph2">
+                    <app-tabelar-view-by-month></app-tabelar-view-by-month>
+                </div>
+                <div class="history-charts-body" *ngIf="compGraph3">
+                    <app-tabelar-view-by-year></app-tabelar-view-by-year>
+                </div>
+            </ng-container>
+        </div>
+    </div>
+</div>

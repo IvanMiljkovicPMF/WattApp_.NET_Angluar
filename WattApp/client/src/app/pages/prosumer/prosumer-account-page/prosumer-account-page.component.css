@@ -1,0 +1,200 @@
+.main {
+    min-height: 100vh;
+}
+
+.centar {
+    width: 100%;
+    min-height: 100vh;
+    text-align: left;
+}
+
+.container {
+    display: none;
+}
+
+body {
+    background: #BA68C8;
+}
+
+.form-control:focus {
+    box-shadow: none;
+    border-color: #BA68C8;
+}
+
+.profile-button {
+    background: #BA68C8;
+    box-shadow: none;
+    border: none;
+}
+
+.profile-button:hover {
+    background: #682773;
+}
+
+.profile-button:focus {
+    background: #682773;
+    box-shadow: none;
+}
+
+.profile-button:active {
+    background: #682773;
+    box-shadow: none;
+}
+
+.back:hover {
+    color: #682773;
+    cursor: pointer;
+}
+
+#imgdevice {
+    position: relative;
+    width: 30%;
+}
+
+.back {
+    text-align: left;
+}
+
+#turnback {
+    margin-top: 10px;
+    width: 7%;
+}
+
+h1 {
+    text-align: center;
+    margin-top: 27px;
+    font-size: 20px;
+}
+
+ul {
+    margin-top: 20px;
+    margin-left: -15px;
+    text-align: left;
+    list-style: none;
+}
+
+ul li {
+    text-decoration: none;
+    font-size: 20px;
+}
+
+a {
+    color: black;
+    text-decoration: none;
+}
+
+.aa {
+    margin-top: 10px;
+}
+
+.aa a {
+    border-radius: 5px;
+    margin-top: 15px;
+    padding: 5px;
+    color: #727272;
+}
+
+.userimg {
+    display: flex;
+    justify-content: center;
+}
+
+a:hover {
+    border-radius: 5px;
+    background-color: rgb(129, 202, 248);
+    color: white;
+}
+
+.card {
+    padding-top: 20%;
+    padding-bottom: 61px;
+    min-height: 100vh;
+    border-radius: 0px;
+}
+
+#imgdevice1 {
+    width: 30px;
+}
+
+#imgdevice11 {
+    width: 30px;
+    margin-left: -4px;
+}
+
+#imgdevice111 {
+    width: 28px;
+}
+
+#pass {
+    margin-left: 2px;
+}
+
+#logout {
+    margin-left: 6px;
+}
+
+#number {
+    border-bottom: 1px solid rgb(183, 183, 183);
+    max-width: 300px;
+}
+
+.phone {
+    display: block;
+    padding-top: 61px;
+    padding-bottom: 65px;
+}
+
+.rounded-circle {
+    width: 100px;
+    margin-bottom: 37px;
+}
+
+@media (min-width: 768px) {
+    .phone {
+        display: none;
+    }
+    .container {
+        display: block;
+    }
+    .main {
+        top: 0;
+        right: 0;
+        left: 0;
+        display: flex;
+        align-items: center;
+        position: absolute;
+        justify-content: center;
+        min-height: 100vh;
+    }
+    .rounded-circle {
+        width: 200px;
+        margin-bottom: 37px;
+    }
+    .col-md-8 {
+        border-radius: 37px;
+        background-color: #a2c7fb;
+    }
+    #logout {
+        color: black;
+        cursor: pointer;
+    }
+    .col-md-6 {
+        margin-left: 202px;
+        font-size: 24px !important;
+    }
+    .col-md-6 input {
+        font-size: 24px !important;
+    }
+    .col-md-4 span {
+        margin-bottom: 5px !important;
+        font-size: 24px !important;
+    }
+    .col-md-4 a {
+        margin-bottom: 5px !important;
+        font-size: 24px !important;
+    }
+    app-footer {
+        width: 100%;
+        display: contents;
+    }
+}

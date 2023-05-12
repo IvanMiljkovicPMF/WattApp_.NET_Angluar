@@ -1,0 +1,39 @@
+<app-prosumer-navbar>
+</app-prosumer-navbar>
+<div class="main">
+    <div class="centar">
+        <div class="card">
+            <div class="back">
+                <a [routerLink]='["/profile"]'><img id="turnback" src="assets/img/back.png" alt=""></a>
+
+            </div>
+            <div>
+                <img id="imgdevice" src="assets/img/account.png" alt="">
+            </div>
+            <h1>{{name}}</h1>
+
+            <form #form="ngForm" (ngSubmit)="upDateProsumer()">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" class="form-control" id="id" name="username" [(ngModel)]="updateUserDetail.username ">
+                </div>
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" class="form-control" id="id" name="name" [(ngModel)]="updateUserDetail.name ">
+                </div>
+
+
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="text" class="form-control" id="id" name="email" [(ngModel)]="updateUserDetail.email ">
+                </div>
+
+                <button type="submite" class="btn btn-primary">Save</button>
+                <button type="submite" class="btn btn-primary" id="giveupbutton" *ngIf="this.role==this.prosumer" [routerLink]="['/profile']">Cancel</button>
+            </form>
+        </div>
+
+    </div>
+    <app-footer></app-footer>
+    <app-prosumer-footer></app-prosumer-footer>
+</div>

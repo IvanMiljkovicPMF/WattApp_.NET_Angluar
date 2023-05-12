@@ -1,0 +1,755 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Server</name>
+    </assembly>
+    <members>
+        <member name="M:Server.Controllers.AuthenticationController.Login(Server.DTOs.LoginDTO)">
+            <summary>Login</summary>
+        </member>
+        <member name="M:Server.Controllers.AuthenticationController.Register(Server.DTOs.UserCreateDTO)">
+            <summary>
+            Register as guest
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.AuthenticationController.GenerateResetToken(Server.DTOs.Requests.EmailRequestDTO)">
+            <summary>
+            Send reset password token on mail
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.AuthenticationController.ResetPassword(Server.DTOs.Requests.ResetPasswordRequestDTO)">
+            <summary>
+            Reset password
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.CurrentPeriodHistoryController.GetHistoryForDeviceFromCurrentYear(System.Int64,System.Int64,System.Int64,System.Int64,System.Int64)">
+            <summary>
+            Device Consumption/Production for current year, month, day
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.CurrentPeriodHistoryController.GetHistoryForProsumerFromCurrentYear(System.Int64,System.Int64,System.Int64,System.Int64,System.Int64,System.Int64,System.Int64)">
+            <summary>
+            Prosumer Consumption/Production for current year, month, day
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.CurrentPeriodHistoryController.GetCurrentHistoryPeriodPagination(System.Int32,System.Int32,System.Int64,System.Int64,System.Int64,System.Int64)">
+            <summary>
+            Pagination
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.DeviceController.formatDeviceResponseDTO(Server.DTOs.DeviceResponseDTO@,System.Int64)">
+            <summary>
+            Format deviceResponseDTO -> get category, type, brand and model name 
+            </summary>
+            <param name="responseDTO">responseDTO that you want to format</param>
+            <param name="id">model id</param>
+        </member>
+        <member name="M:Server.Controllers.DeviceController.getDeviceById(System.Int64)">
+            <summary>
+            Get device by device id (DSO if he has permissions, for PROSUMER if its his device)
+            </summary>
+            
+        </member>
+        <member name="M:Server.Controllers.DeviceController.getUserDevices(System.Int64,System.Int32,System.Int32,Server.Filters.DeviceFilterModel)">
+            <summary>
+            Get all devices from user (for DSO)
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.DeviceController.getAllDevices(System.Int32,System.Int32,Server.Filters.DeviceFilterModel)">
+            <summary>
+            Get all devices (for PROSUMER)
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.DeviceController.addNewDevice(Server.DTOs.DeviceCreateDTO)">
+            <summary>
+            Add new device if you are PROSUMER or GUEST
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.DeviceController.changeTurnOnStatus(System.Int64)">
+            <summary>
+            Change turn on/off status of device (DSO + PROSUMER)
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.DeviceController.changeDeviceControlability(System.Int64)">
+            <summary>
+            Change controlability status of device (DSO + PROSUMER)
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.DeviceController.changeDeviceVisibility(System.Int64)">
+            <summary>
+            Change visibility status of device (DSO + PROSUMER)
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.DSOController.GetSettlements(System.Int64,System.Int64,System.Int64)">
+            <summary>
+            1.) Get (settlementId, settlementName) --- 2.) Consumption/Production for settlement - today by hour
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.DSOController.GetCity(System.Int64,System.Int64,System.Int64,System.Int64,System.Int64,System.String)">
+            <summary>
+            1.) Get double consumptio/production for cityId - today or this month || 2.) Get cityId
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.DSOController.GetCityPagination(System.Int32,System.Int32,System.Int64,System.Int64,System.Int64)">
+            <summary>
+            Pagination for table
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.HistoryController.GetHistoryForDeviceInLastYear(System.Int64)">
+            <summary>
+            Total device Consumption/Production in last year
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.HistoryController.GetHistoryForDeviceInLastMonth(System.Int64)">
+            <summary>
+            Total device Consumption/Production in last month
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.HistoryController.GetHistoryForDeviceInLastDay(System.Int64)">
+            <summary>
+            Total device Consumption/Production in last day
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.HistoryController.GetHistoryForDeviceInPastWeek(System.Int64)">
+            <summary>
+            Total device Consumption/Production in last week
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.HistoryController.GetHistoryForDeviceInPastYearByMonth(System.Int64)">
+            <summary>
+            Consumption/Production history for device in past year by month
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.HistoryController.GetHistoryForDeviceInPastMonthByDay(System.Int64)">
+            <summary>
+            Consumption/Production history for device in past month by day
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.HistoryController.GetHistoryForDeviceInPastWeekByDay(System.Int64)">
+            <summary>
+            Consumption/Production history for device in past week by day
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.HistoryController.GetTotalConsumptionByUser(System.Int64,System.Int64)">
+            <summary>
+            Consumption/Production for all user`s devices
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.HistoryController.GetHistoryByUserForPastDay(System.Int64,System.Int64)">
+            <summary>
+            Consumption/Production for user, past day
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.HistoryController.GetHistoryByUserForPastWeek(System.Int64,System.Int64)">
+            <summary>
+            Consumption/Production for user in past week
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.HistoryController.GetHistoryByUserForPastMonth(System.Int64,System.Int64)">
+            <summary>
+            Consumption/Production for user in past month
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.HistoryController.GetConsumptionByUserForYear(System.Int64,System.Int64)">
+            <summary>
+            Consumption/Production for user in past year
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.HistoryController.GetConsumptionByUserForYearByMonth(System.Int64,System.Int64)">
+            <summary>
+            Consumption/Production for all user`s devices in past year (by month)
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.HistoryController.GetUserHistoryForPastMonthByDay(System.Int64,System.Int64)">
+            <summary>
+            Consumption/Production for all user`s devices for last month (by day)
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.HistoryController.GetUserHistoryForPastWeekByDay(System.Int64,System.Int64)">
+            <summary>
+            Consumption/Production for all user`s devices for last week (by day)
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.HistoryController.GetUserHistoryForPastDayByHour(System.Int64,System.Int64)">
+            <summary>
+            Consumption/Production for user (yesterday by hour)
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.HistoryController.GetSettlementHistoryForPastWeekByDay(System.Int64,System.Int64)">
+            <summary>
+            Consumption/Production for all users from settlement for last week (by day)
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.HistoryController.GetCityHistoryForPastWeekByDay(System.Int64,System.Int64)">
+            <summary>
+            Consumption/Production for all users from city for last week (by day)
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.HistoryController.GetSettlementHistoryForPastMonthByDay(System.Int64,System.Int64)">
+            <summary>
+            Consumption/Production for all users from settlement for last month (by day)
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.HistoryController.GetCityHistoryForPastMonthByDay(System.Int64,System.Int64)">
+            <summary>
+            Consumption/Production for all users from city for last month (by day)
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.HistoryController.GetCityHistoryForPastYearByMonth(System.Int64,System.Int64)">
+            <summary>
+            Consumption/Production for all users from city for last year (by month)
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.HistoryController.GetSettlementHistoryForPastYearByMonth(System.Int64,System.Int64)">
+            <summary>
+            Consumption/Production for all users from settlement for last year (by month)
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.HistoryController.GetHistoryForDeviceInThisMonth(System.Int64)">
+            <summary>
+            Total device Consumption/Production in this month
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.HistoryController.GetHistoryForDeviceToday(System.Int64)">
+            <summary>
+            Total device Consumption/Production today
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.HistoryController.GetHistoryForDeviceThisYear(System.Int64)">
+            <summary>
+            Total device Consumption/Production this year
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.HistoryController.GetHistoryForDevicePreviousMonth(System.Int64)">
+            <summary>
+            Total device Consumption/Production this year
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.HistoryFromToController.GetHistoryForCity(System.String,System.String,System.Int64,System.Int64,System.Int64,System.Int64,System.Int64,System.Int64,System.Int64,System.Int64,System.Int64,System.Int64,System.Int64,System.Int64,System.Int64,System.Int64,System.Int64,System.Int64,System.Int64)">
+            <summary>
+            Histroy - From To
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.HistoryFromToController.GetHistoryFromDateToDatePagination(System.Int32,System.Int32,System.String,System.String,System.Int64,System.Int64,System.Int64,System.Int64,System.Int64)">
+            <summary>
+            Histroy - From To
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.OperaterController.GetPage(System.Int32)">
+            <summary>
+            Get 20 users per page
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.OperaterController.GetUserById(System.Int64)">
+            <summary>
+            Get single user
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.OperaterController.CreateUser(Server.DTOs.UserCreateDTO)">
+            <summary>
+            Create user
+            </summary>
+            <response code="200">Success</response>
+            <response code="400">Bad request</response>
+        </member>
+        <member name="M:Server.Controllers.OperaterController.UpdateUserByAdmin(Server.DTOs.UpdateUserByAdminDTO,System.Int64)">
+            <summary>
+            Update user by admin
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.OperaterController.DeleteUser(System.Int64)">
+            <summary>
+            Delete user
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.PredictionController.GetDevicePredictionForNextWeekByDay(System.Int64)">
+            <summary>
+            Device prediction for next week (by day)
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.PredictionController.GetUserPredictionForNextWeekByDay(System.Int64,System.Int64)">
+            <summary>
+            User prediction for next week (by day)
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.PredictionController.GetCityOrSettlementPredictionForNextWeekByDay(System.Int64,System.Int64,System.Int64,System.Int64,System.Int64,System.Int64,System.Int64)">
+            <summary>
+            City|Settlement prediction for next/previous week (by day)
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.ProsumerController.GetTotalConsumptionInTheMomentForCategory(System.Int64)">
+            <summary>
+            Total Consumption/Production in The Moment (country)
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.ProsumerController.GetTotalConsumptionInTheMomentForCategoryInSettlement(System.Int64,System.Int64)">
+            <summary>
+            Total Consumption/Production in The Moment (Settlement)
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.ProsumerController.GetTotalConsumptionInTheMomentForCategoryInCity(System.Int64,System.Int64)">
+            <summary>
+            Total Consumption/Production in The Moment (City)
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.ProsumerController.GetTotalConsumptionInTheMomentForCategoryOneProsumer(System.Int64,System.Int64)">
+            <summary>
+            Total Consumption/Production in The Moment (one prosumer)
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.ProsumerController.GetAvgConsumptionInTheMomentForSettlement(System.Int64,System.Int64)">
+            <summary>
+            Average Consumption/Production in The Moment (settlement)
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.ProsumerController.GetAvgConsumptionInTheMomentForCity(System.Int64,System.Int64)">
+            <summary>
+            Average Consumption/Production in The Moment (city)
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.ProsumerController.GetAvgConsumptionInTheMomentForCountry(System.Int64)">
+            <summary>
+            Average Consumption/Production in The Moment (country)
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.ProsumerController.GetTotalNumberOfDevicesInTheCityOrSettlement(System.String,System.Int64,System.Int64,System.Int64)">
+            <summary>
+            Total number of consumption/production devices from all prosumers in the city or settlement
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.ProsumerController.GetDeviceEnergyFromTodaysDay(System.Int64,System.Int64,System.Int64,System.Int64)">
+            <summary>
+            1.) Today`s Consumption/Production for device (by hour) || 2.) Today`s Consumption/Production for one prosumer (double)
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.ProsumerController.GetProsumerEnergyFromThisMonth(System.Int64,System.Int64)">
+            <summary>
+            1.) This month Consumption/Production for one prosumer (double)
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.ProsumerController.GetNumberOfDevicesOfOneProsumer(System.Int64)">
+            <summary>
+            Number of devices from one prosumer
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.ProsumerController.HowMuchDeviceWorked(System.Int64,System.DateTime,System.DateTime)">
+            <summary>
+            How much device worked
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.ProsumersDetailsController.GetAllProsumers(System.String,System.Nullable{System.Int32})">
+            <summary>Get all prosumers for map</summary>
+        </member>
+        <member name="M:Server.Controllers.ProsumersDetailsController.GetPage(System.Int32,System.Int64,System.Int32)">
+            <summary>
+            Get page of prosumers
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.UsersController.GetPage(Server.Filters.UserFilterModel,System.Int32,System.Int32)">
+            <summary>
+            Get 20 users per page
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.UsersController.GetUserById(System.Int64)">
+            <summary>
+            Get single user
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.UsersController.GetMyData">
+            <summary>
+            Get data for logged in user
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.UsersController.GetRoles">
+            <summary>
+            Get all roles
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.UsersController.CreateUser(Server.DTOs.UserCreateDTO)">
+            <summary>
+            Create user
+            </summary>
+            <response code="200">Success</response>
+            <response code="400">Bad request</response>
+        </member>
+        <member name="M:Server.Controllers.UsersController.UpdateUserByAdmin(Server.DTOs.UpdateUserByAdminDTO,System.Int64)">
+            <summary>
+            Update user by admin
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.UsersController.UpdateLoggedInUser(Server.DTOs.UserUpdateDTO)">
+            <summary>
+            Update logged in user data
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.UsersController.BlockUser(Server.DTOs.BlockedStatusDTO,System.Int64)">
+            <summary>
+            Block or unblock user
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.UsersController.DeleteUser(System.Int64)">
+            <summary>
+            Delete user
+            </summary>
+        </member>
+        <member name="M:Server.Controllers.UsersController.ChangePassword(Server.DTOs.ChangePasswordDTO)">
+            <summary>
+            Change password
+            </summary>
+        </member>
+        <member name="T:Server.DTOs.DataPage`1">
+            <summary>
+            Data get from database using pagination ( only one page )
+            </summary>
+        </member>
+        <member name="T:Server.DTOs.Responses.BadRequestStatusResponse">
+            <summary>
+            BadRequestResponse
+            </summary>
+        </member>
+        <member name="T:Server.Filters.AuthResponsesOperationFilter">
+            <summary>
+            Auth response filter for Swagger
+            </summary>
+        </member>
+        <member name="M:Server.Filters.AuthResponsesOperationFilter.Apply(Microsoft.OpenApi.Models.OpenApiOperation,Swashbuckle.AspNetCore.SwaggerGen.OperationFilterContext)">
+            <summary>
+            
+            </summary>
+            <param name="operation"></param>
+            <param name="context"></param>
+        </member>
+        <member name="T:Server.Filters.BadRequestValidationFilter">
+            <summary>
+            Returns default Bad request if request is not valid
+            </summary>
+        </member>
+        <member name="M:Server.Filters.BadRequestValidationFilter.OnActionExecuting(Microsoft.AspNetCore.Mvc.Filters.ActionExecutingContext)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Server.Filters.BadRequestValidationFilter.OnActionExecuted(Microsoft.AspNetCore.Mvc.Filters.ActionExecutedContext)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Server.Middlewares.TokenValidationMiddleware">
+            <summary>
+            Token validation middleware
+            </summary>
+        </member>
+        <member name="M:Server.Middlewares.TokenValidationMiddleware.#ctor(Microsoft.AspNetCore.Http.RequestDelegate,Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            Dependency injection
+            </summary>
+            <param name="next"></param>
+            <param name="configuration"></param>
+        </member>
+        <member name="M:Server.Middlewares.TokenValidationMiddleware.Invoke(Microsoft.AspNetCore.Http.HttpContext,Server.Data.SqliteDbContext)">
+            <summary>
+            Check if role in token is the same as role in database
+            </summary>
+            <param name="context"></param>
+            <param name="_sqliteDb"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Server.Middlewares.TokenValidationMiddlewareExtensions">
+            <summary>
+            Static class for using middleware
+            </summary>
+        </member>
+        <member name="M:Server.Middlewares.TokenValidationMiddlewareExtensions.UseTokenValidation(Microsoft.AspNetCore.Builder.IApplicationBuilder)">
+            <summary>
+            Allow to use app.UseTokenValidation() as method of app
+            </summary>
+            <param name="builder"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Server.Program">
+            <summary>
+            Server starter
+            </summary>
+        </member>
+        <member name="M:Server.Program.Main(System.String[])">
+            <summary>
+            Main function
+            </summary>
+            <param name="args"></param>
+        </member>
+        <member name="M:Server.Program.AddMiddlewares(Microsoft.AspNetCore.Builder.WebApplication)">
+            <summary>
+            Add middlewares
+            </summary>
+            <param name="app">Web application</param>
+        </member>
+        <member name="M:Server.Program.AddServices(Microsoft.AspNetCore.Builder.WebApplicationBuilder)">
+            <summary>
+            
+            </summary>
+            <param name="builder"></param>
+        </member>
+        <member name="M:Server.Services.DeviceService.getDeviceById(System.Int64)">
+            <summary>
+            Get device from database by it's unique id if you are DSO
+            </summary>
+            <param name="deviceId">Unique device id</param>
+            <returns>Device object</returns>
+        </member>
+        <member name="M:Server.Services.DeviceService.getYourDeviceById(System.Int64,System.Int64)">
+            <summary>
+            Get yours device from database by it's unique id if you are PROSUMER
+            </summary>
+            <param name="deviceId">Unique device id</param>
+            <returns>Device object</returns>
+        </member>
+        <member name="M:Server.Services.DeviceService.getUserDevices(System.Int64,Server.Filters.DeviceFilterModel,System.Int32,System.Int32)">
+            <summary>
+            Get all devices with visibility permission by userId (for DSO)
+            </summary>
+            <param name="userId">Unique user id</param>
+            <returns>List of devices</returns>
+        </member>
+        <member name="M:Server.Services.DeviceService.getMyDevices(System.Int64,Server.Filters.DeviceFilterModel,System.Int32,System.Int32)">
+            <summary>
+            Get your devices (for PROSUMER)
+            </summary>
+            <param name="userId">Unique user id</param>
+            <returns>List of devices</returns>
+        </member>
+        <member name="M:Server.Services.DeviceService.addNewDevice(Server.Models.Device)">
+            <summary>
+            Add new device (for PROSUMER)
+            </summary>
+            <param name="device">Device</param>
+            <returns>Added device</returns>
+        </member>
+        <member name="M:Server.Services.DeviceService.changeTurnOnStatus(System.Int64,System.Int64)">
+            <summary>
+            Turn on/off your device if you are PROSUMER
+            </summary>
+            <param name="deviceId">Id from device you want to turn on/off</param>
+            <param name="userId">User id to make sure he is changing status of his own device</param>
+            <returns>Device which status was changed</returns>
+        </member>
+        <member name="M:Server.Services.DeviceService.changeTurnOnStatus(System.Int64)">
+            <summary>
+            Turn on/off specific device if you are DSO, but only if you have permision
+            </summary>
+            <param name="deviceId">Id from device you want to turn on/off</param>
+            <returns>Device which status was changed</returns>
+        </member>
+        <member name="M:Server.Services.DeviceService.deleteDeviceById(System.Int64,System.Int64)">
+            <summary>
+            Delete device by its unique id (for PROSUMER)
+            </summary>
+            <param name="id">Device id</param>
+            <returns>Deleted device</returns>
+        </member>
+        <member name="M:Server.Services.DeviceService.changeDeviceVisibility(System.Int64,System.Int64)">
+            <summary>
+            Change the visibility status for the device by its unique id (for PROSUMER)
+            </summary>
+            <param name="deviceId">Id for device</param>
+            <param name="userId">Id for user</param>
+            <returns>Changed device</returns>
+        </member>
+        <member name="M:Server.Services.DeviceService.changeDeviceControlability(System.Int64,System.Int64)">
+            <summary>
+            Change the controlability status for the device by its unique id (for PROSUMER)
+            </summary>
+            <param name="deviceId">Id for device</param>
+            <param name="userId">Id for user (logged user)</param>
+            <returns></returns>
+        </member>
+        <member name="T:Server.Services.IEmailService">
+            <summary>
+            Email service
+            </summary>
+        </member>
+        <member name="M:Server.Services.IEmailService.SendEmail(System.String,System.String,System.String,System.Boolean)">
+            <summary>
+            Send email
+            </summary>
+            <param name="destination">destination email</param>
+            <param name="subject"></param>
+            <param name="body"></param>
+            <param name="isBodyHtml"></param>
+        </member>
+        <member name="M:Server.Services.Implementations.DeviceServiceImpl.addNewDevice(Server.Models.Device)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Server.Services.Implementations.DeviceServiceImpl.changeDeviceVisibility(System.Int64,System.Int64)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Server.Services.Implementations.DeviceServiceImpl.changeDeviceControlability(System.Int64,System.Int64)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Server.Services.Implementations.DeviceServiceImpl.changeTurnOnStatus(System.Int64)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Server.Services.Implementations.DeviceServiceImpl.changeTurnOnStatus(System.Int64,System.Int64)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Server.Services.Implementations.DeviceServiceImpl.deleteDeviceById(System.Int64,System.Int64)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Server.Services.Implementations.DeviceServiceImpl.editDevice(Server.Models.Device,System.Int64)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Server.Services.Implementations.DeviceServiceImpl.getDeviceById(System.Int64)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Server.Services.Implementations.DeviceServiceImpl.getMyDevices(System.Int64,Server.Filters.DeviceFilterModel,System.Int32,System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Server.Services.Implementations.DeviceServiceImpl.getYourDeviceById(System.Int64,System.Int64)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Server.Services.Implementations.DeviceServiceImpl.getUserDevices(System.Int64,Server.Filters.DeviceFilterModel,System.Int32,System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Server.Services.Implementations.EmailService">
+            <summary>
+            Email service implementation
+            </summary>
+        </member>
+        <member name="F:Server.Services.Implementations.EmailService.configuration">
+            <summary>
+            Represents a set of key/value application configuration properties
+            </summary>
+        </member>
+        <member name="F:Server.Services.Implementations.EmailService.smtpClient">
+            <inheritdocs/>
+        </member>
+        <member name="M:Server.Services.Implementations.EmailService.#ctor(Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            Dependency injection
+            </summary>
+            <param name="configuration"></param>
+        </member>
+        <member name="M:Server.Services.Implementations.EmailService.SendEmail(System.String,System.String,System.String,System.Boolean)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Server.Services.Implementations.TokenService">
+            <summary>
+            Create token and get data from token
+            </summary>
+        </member>
+        <member name="F:Server.Services.Implementations.TokenService.config">
+            <summary>
+            Represents a set of key/value application configuration properties
+            </summary>
+        </member>
+        <member name="M:Server.Services.Implementations.TokenService.#ctor(Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            Dependency injection
+            </summary>
+            <param name="config"></param>
+        </member>
+        <member name="M:Server.Services.Implementations.TokenService.CreateJwtToken(Server.Models.UserModel)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Server.Services.Implementations.TokenService.GetClaim(Microsoft.AspNetCore.Http.HttpContext,System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Server.Services.ITokenService">
+            <summary>
+            Token Service Dependancy injection
+            </summary>
+        </member>
+        <member name="M:Server.Services.ITokenService.CreateJwtToken(Server.Models.UserModel)">
+            <summary>
+            Create JWT token
+            </summary>
+            <param name="user">Logged in user</param>
+            <returns>JWT token</returns>
+        </member>
+        <member name="T:Server.Utilities.HashGenerator">
+            <summary>
+            Hash generator
+            </summary>
+        </member>
+        <member name="F:Server.Utilities.HashGenerator.SaltSize">
+            <summary>
+            Size of salt.
+            </summary>
+        </member>
+        <member name="F:Server.Utilities.HashGenerator.HashSize">
+            <summary>
+            Size of hash.
+            </summary>
+        </member>
+        <member name="M:Server.Utilities.HashGenerator.Hash(System.String,System.Int32)">
+            <summary>
+            Creates a hash from a password.
+            </summary>
+            <param name="password">The password.</param>
+            <param name="iterations">Number of iterations.</param>
+            <returns>The hash.</returns>
+        </member>
+        <member name="M:Server.Utilities.HashGenerator.Hash(System.String)">
+            <summary>
+            Creates a hash from a password with 10000 iterations
+            </summary>
+            <param name="password">The password.</param>
+            <returns>The hash.</returns>
+        </member>
+        <member name="M:Server.Utilities.HashGenerator.IsHashSupported(System.String)">
+            <summary>
+            Checks if hash is supported.
+            </summary>
+            <param name="hashString">The hash.</param>
+            <returns>Is supported?</returns>
+        </member>
+        <member name="M:Server.Utilities.HashGenerator.Verify(System.String,System.String)">
+            <summary>
+            Verifies a password against a hash.
+            </summary>
+            <param name="password">The password.</param>
+            <param name="hashedPassword">The hash.</param>
+            <returns>Could be verified?</returns>
+        </member>
+        <member name="T:Server.Utilities.JwtClaims">
+            <summary>
+            JwtClaims
+            </summary>
+        </member>
+        <member name="F:Server.Utilities.JwtClaims.Id">
+            <summary>
+            Id
+            </summary>
+        </member>
+        <member name="F:Server.Utilities.JwtClaims.Role">
+            <summary>
+            Role
+            </summary>
+        </member>
+        <member name="T:Server.Utilities.PasswordGenerator">
+            <summary>
+            Password generator
+            </summary>
+        </member>
+        <member name="M:Server.Utilities.PasswordGenerator.GenerateRandomPassword(System.Int32)">
+            <summary>
+            Generate random password
+            </summary>
+            <param name="length">Length of password</param>
+            <returns>Password</returns>
+        </member>
+        <member name="T:Server.ValidationAtributes.MinValue">
+            <summary>
+            Check if value of attribute is greater than some number
+            </summary>
+        </member>
+        <member name="M:Server.ValidationAtributes.MinValue.#ctor(System.Int32)">
+            <summary>
+            Set min value
+            </summary>
+            <param name="value"></param>
+        </member>
+        <member name="M:Server.ValidationAtributes.MinValue.IsValid(System.Object)">
+            <summary>
+            Check if property is valid
+            </summary>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

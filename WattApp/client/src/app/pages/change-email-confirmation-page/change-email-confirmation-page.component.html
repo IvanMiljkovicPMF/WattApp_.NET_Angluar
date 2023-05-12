@@ -1,0 +1,57 @@
+
+<div class="main-container">
+    <div class="loading-container" *ngIf="loading">
+        <div class="spinning-loading-container"></div>
+        <div class="loading-text-container">
+            Please wait...
+        </div>
+    </div>
+    <div *ngIf="!loading && isConfirmed">
+        <div class="container"> 
+            <div class="image-container"> 
+                <img src="assets/emailConfirmation/success.png" alt="Email confirmation successfully.">
+            </div>
+            <div>
+                <div class="title-container">
+                    <h2>Email change confirmed successfully</h2>
+                </div>
+                <div class="message-container">
+                    <p>
+                        Congratulations! Your email address has been successfully changed. Thank you for using our services.
+                        <br>
+                        <br>
+                        Sincerely, <br>
+                        The <i>ElectricAssist Team</i>
+                    </p>
+                </div>
+                <div class="button-container">
+                    <button><a (click)="goToLoginPage()">Open app</a></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="!loading && !isConfirmed">
+        <div class="container"> 
+            <div class="image-container"> 
+                <img src="assets/emailConfirmation/not_confirmed.png" alt="Email confirmation failed.">
+            </div>
+            <div>
+                <div class="title-container">
+                    <h2>Failed to confirm your email address change</h2>
+                </div>
+                <div class="message-container">
+                    <p>
+                        We apologize because your email address confirmation did not go as planned. It appears that <b><i>{{message}}</i></b>.
+                        <br>
+                        Please contact our app administrator to help resolve this problem.
+                        <br>
+                        <br>
+                        Sincerely, <br>
+                        The <i>ElectricAssist Team</i>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

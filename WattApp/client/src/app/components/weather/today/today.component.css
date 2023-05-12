@@ -1,0 +1,126 @@
+@import url(https://fonts.googleapis.com/css?family=Open+Sans:300,400,700);
+@import url(https://cdnjs.cloudflare.com/ajax/libs/weather-icons/1.2/css/weather-icons.min.css);
+#weather_wrapper{
+  width: 100%;
+ 
+}
+.weatherCard {
+  display: flex;
+  justify-content: space-around;
+  font-family: 'Open Sans';
+  border-radius: 30px;
+}
+
+.currentTemp {
+width: 50%;
+display: inline-block;
+  /* background: #ffffff; */
+  top: 0;
+  left: 0;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+.currentWeather {
+  width: 20%;
+  display: inline-block;
+  /* background: #2ab2ea; */
+  margin: 0;
+  text-align: center;
+  top: 0;
+  right: 0;
+  border-radius: 10px;
+}
+img{
+  width:  180px;
+  height: 180px;
+}
+.temp {
+  font-size: 120px;
+  text-align: center;
+  
+  color: #000000;
+  
+}
+.location {
+  color: #000000;
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 50px;
+  display: block;
+}
+.conditions {
+  /* background-color: #ffffff; */
+  font-size: 30px;
+  display: block;
+  text-align: center;
+}
+
+
+.info {
+
+  bottom: 0;
+  right: 0;
+  margin-top: -60px;
+  /* background: #2ab2ea; */
+  font-size: 20px;
+  color: #000000;
+  text-align: center;
+  /* margin-right: 15%; */
+}
+.rain,
+.wind {
+  width: 50%;
+  top: 3px;
+}
+.wind {
+  right: -8px;
+}
+.wind::before {
+  display: block;
+  content: '\f050';
+  font-family: weathericons;
+  font-size: 20px;
+  left: -8px;
+
+  top: 5px;
+}
+
+@media only screen and (min-width: 768px) {
+  .weatherCard {
+      border-radius: 20px;
+  }
+  .currentTemp {
+      border-top-left-radius: 5px;
+      border-top-right-radius: 5px;
+  }
+  .currentWeather {
+      width: 50%;
+      border-radius: 5px;
+  }
+  .temp {
+      font-size: 70px;
+  }
+  .location {
+      font-size: 30px;
+  }
+  .conditions {
+      font-size: 24px;
+  }
+  .info {
+      
+      margin-bottom: 10px;
+  }
+  .rain,
+  .wind {
+      width: 50%;
+      top: 3px;
+  }
+  .wind {
+      right: -5px;
+  }
+  .wind::before {
+      font-size: 16px;
+      top: 5px;
+      left: -5px;
+  }
+}

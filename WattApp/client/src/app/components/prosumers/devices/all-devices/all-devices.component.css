@@ -1,0 +1,160 @@
+.main {
+    min-height: 100vh;
+}
+
+.alldevices {
+    top: 43px;
+    left: 0;
+    right: 0;
+    height: auto;
+    max-width: 100%;
+    position: relative;
+}
+
+.adddevices {
+    border-bottom: 1px solid rgb(197, 233, 230);
+    position: relative;
+    height: auto;
+}
+
+#allh1 {
+    padding-left: 15px;
+    padding-top: 15px;
+    font-size: 15px;
+}
+
+.btn {
+    background-color: #1C315E;
+    border-color: #1C315E;
+    margin-top: -35px;
+    position: relative;
+    float: right;
+    font-size: 14px;
+    margin-right: 5px;
+}
+
+.devices {
+    width: 100%;
+    height: auto;
+    text-align: center;
+    transition: all 0.3s;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.devices-item {
+    background-size: cover;
+    box-shadow: 5px dodgerblue;
+    background-color: #bce9e4;
+    border-radius: 15px;
+    width: 30%;
+    margin: 5px;
+    text-align: center;
+    display: inline-block;
+    position: relative;
+}
+
+#deviceh3 {
+    padding-top: 10px;
+    font-size: 14px;
+}
+
+#imgdevice {
+    position: relative;
+    display: inline-block;
+    width: 65%;
+    margin: 15%;
+}
+
+.devices-device-item {
+    border: 3px solid rgb(42, 134, 99);
+    border-radius: 100px;
+    max-width: 100%;
+    display: inline-block;
+    background-color: white;
+    position: relative;
+    margin: 5px;
+}
+
+.devices-device-item1 {
+    border: 3px solid rgb(236, 7, 41);
+    border-radius: 100px;
+    max-width: 100%;
+    display: inline-block;
+    background-color: white;
+    position: relative;
+    margin: 5px;
+}
+
+#deviceCategoryId {
+    width: 41%;
+    font-size: 12px;
+    margin-left: 26%;
+    margin-top: -35px;
+}
+
+label {
+    display: inline-block;
+    font-size: 15px;
+    margin-left: 4%;
+    margin-bottom: 0.5rem;
+}
+
+#nodevices {
+    margin-top: 30%;
+    font-size: 20px;
+}
+
+@media (min-width: 768px) {
+    .alldevices {
+        top: 10%;
+        position: absolute;
+    }
+    #allh1 {
+        font-size: 30px;
+        padding-left: 12%;
+        padding-bottom: 15px;
+    }
+    #imgdevice {
+        width: 35%;
+    }
+    .devices-device-item {
+        margin: 15px;
+        width: 75%;
+    }
+    .devices-device-item1 {
+        margin: 15px;
+        width: 75%;
+    }
+    #deviceh3 {
+        font-size: 35px;
+    }
+    .devices-item {
+        padding: 10px;
+        width: 25%;
+    }
+    .btn {
+        background-color: #1C315E;
+        border-color: #1C315E;
+        margin-top: -55px;
+        font-size: 20px;
+        width: 200px;
+        margin-right: 8%;
+    }
+    #deviceCategoryId {
+        width: 20%;
+        font-size: 20px;
+        margin-left: 40%;
+        margin-top: -50px;
+        margin-bottom: 0.8rem;
+    }
+    label {
+        display: inline-block;
+        margin-left: 25%;
+        font-size: 30px;
+    }
+    #nodevices {
+        margin-top: 10%;
+        font-size: 40px;
+    }
+}

@@ -1,0 +1,386 @@
+a {
+    text-decoration: none;
+}
+
+ul {
+    list-style: none;
+}
+
+.main {
+    top: 0;
+    min-height: 100vh;
+}
+
+.infoSolar {
+    margin-top: -46px;
+}
+
+.prodactionNow {
+    display: flex;
+    justify-content: center;
+}
+
+.homeimage {
+    position: relative;
+    height: auto;
+    width: 100%;
+    z-index: -1;
+}
+
+#homeimg {
+    padding-top: 45px;
+    position: relative;
+    width: 100%;
+    min-height: 240px;
+}
+
+
+/* Logo */
+
+
+/* pravi problem kad se smanji na 320px */
+
+.row {
+    margin: 0;
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+}
+
+.card {
+    background-color: #bce9e4;
+    margin: 5px;
+}
+
+.card-title {
+    font-size: 20px;
+}
+
+.card-text {
+    font-size: 25px;
+}
+
+.midle {
+    border: 1px solid black;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.midletree {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    height: auto;
+}
+
+.midletreeform {
+    margin: 1%;
+    float: left;
+    border: 1px solid black;
+    width: 50%;
+    height: 50px;
+}
+
+
+/* Car and battery */
+
+.carbattery {
+    position: sticky;
+    background-color: white;
+    border-bottom: 1px solid rgb(116, 116, 116);
+    height: 100%;
+    transition: all 0.3s;
+    position: relative;
+    display: flex;
+    text-align: center;
+}
+
+.device-item {
+    width: 30%;
+    height: auto;
+    position: relative;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    display: inline-block;
+    border-radius: 15px;
+    margin: 0.5%;
+    background-color: #eef2ff;
+    transition: all .2s ease-out;
+}
+
+.imgbattery {
+    position: sticky;
+    margin-top: 7px;
+    width: 30%;
+    float: left;
+}
+
+#carbatteryh3 {
+    padding-top: 5px;
+    font-size: 10px;
+}
+
+#carbatteryh2 {
+    font-size: 12px;
+}
+
+
+/* Slide device */
+
+#smarthomeh2 {
+    padding-top: 5px;
+    background-color: white;
+    padding-left: 5px;
+    font-size: 20px;
+    margin: 15px;
+    border-radius: 5px;
+}
+
+.alldevice {
+    position: sticky;
+    margin-top: -10px;
+    background-color: white;
+    width: 100%;
+}
+
+.devices {
+    position: sticky;
+    align-items: stretch;
+    width: 100%;
+    height: auto;
+    text-align: center;
+    transition: all 0.3s;
+    display: flex;
+    overflow-x: auto;
+    position: relative;
+}
+
+.devices-item {
+    position: sticky;
+    background-size: cover;
+    box-shadow: 5px dodgerblue;
+    box-shadow: 2px 5px silver;
+    background-color: white;
+    width: 25%;
+    text-align: center;
+    display: inline-block;
+    flex-shrink: 0;
+    padding-top: 20px;
+}
+
+#deviceh3 {
+    padding-top: 10px;
+    font-size: 12px;
+}
+
+#imgdevice {
+    position: sticky;
+    display: inline-block;
+    width: 65%;
+}
+
+.devices-device-item {
+    border: 3px solid rgb(42, 134, 99);
+    border-radius: 100px;
+    background-size: cover;
+    max-width: 60%;
+    height: auto;
+    display: inline-block;
+}
+
+.moredevices {
+    display: flex;
+    justify-content: center;
+    background-color: white;
+    color: black;
+    width: 100%;
+    margin-top: 15px;
+    padding-left: 5px;
+}
+
+.consumptionNow {
+    border: 1px solid black;
+    display: none;
+}
+
+.prognosis {
+    display: none;
+    width: 50%;
+    height: 7%;
+    top: 12%;
+    right: 2%;
+    position: absolute;
+    transition: all 0.3s;
+}
+
+.solarPowerNow {
+    display: none;
+}
+
+.prodactionToday {
+    min-width: 70px;
+    height: 3%;
+    position: absolute;
+    top: 60px;
+    padding-left: 5px;
+    transition: all 0.3s;
+}
+
+.prodactionToday h2,
+h1 {
+    text-align: center;
+    font-size: 17px;
+    transition: all 0.3s;
+}
+
+.powerTransmissiontower {
+    display: none;
+}
+
+.tower {
+    width: 30%;
+    margin-top: -30%;
+    margin-left: 0px;
+    position: absolute;
+}
+
+.imgtower {
+    width: 60%;
+}
+
+
+/* Responsiveness */
+
+@media (min-width: 768px) {
+    .main {
+        top: 0;
+        position: absolute;
+    }
+    .prodactionNow {
+        width: 310px;
+        margin-top: 15px;
+        margin-left: 40%;
+    }
+    .midle {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100px;
+    }
+    .midletree {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        height: auto;
+    }
+    .card-title {
+        font-size: 25px;
+    }
+    .card-text {
+        font-size: 35px;
+    }
+    .midletreeform {
+        margin: 1%;
+        float: left;
+        border: 1px solid black;
+        width: 50%;
+        height: 50px;
+    }
+    .carbattery {
+        padding-left: 10%;
+    }
+    #smarthomeh2 {
+        padding-left: 25px;
+        font-size: 35px;
+    }
+    #deviceh3 {
+        padding-top: 10px;
+    }
+    #carbatteryh3 {
+        padding-top: 20px;
+        font-size: 30px;
+    }
+    #carbatteryh2 {
+        font-size: 25px;
+    }
+    .logo {
+        font-size: 60px;
+    }
+    .moredevices a {
+        font-size: 35px;
+    }
+    #deviceh3 {
+        font-size: 30px;
+    }
+    .infoSolar {
+        width: 100%;
+        margin: 0;
+        top: 60px !important;
+        position: absolute;
+    }
+    .prodactionToday {
+        display: flexbox;
+        width: 300px;
+        position: absolute;
+        height: 100px;
+        transition: all 0.3s;
+    }
+    .prodactionToday h2,
+    h1 {
+        text-align: center;
+        font-size: 30px;
+        transition: all 0.3s;
+    }
+    .tower {
+        width: 30%;
+        margin-top: -22%;
+        margin-left: 0px;
+        position: absolute;
+    }
+    .imgtower {
+        width: 50%;
+    }
+    .consumptionNow {
+        display: flexbox;
+        width: 15%;
+        height: 15%;
+        top: 30%;
+        display: inline-block;
+        left: 32%;
+        position: absolute;
+        transition: all 0.3s;
+    }
+    .prognosis {
+        display: flex;
+        width: 20%;
+        height: 20%;
+        top: 8%;
+        right: -2%;
+        position: absolute;
+        transition: all 0.3s;
+    }
+    .solarPowerNow {
+        display: flexbox;
+        width: 10%;
+        max-height: 20%;
+        top: 21%;
+        right: 30%;
+        position: absolute;
+        transition: all 0.3s;
+        display: flex;
+    }
+    .powerTransmissiontower {
+        top: 10%;
+        left: 3%;
+        width: 10%;
+        max-height: 20%;
+        text-align: center;
+        display: flex;
+        position: absolute;
+        transition: all 0.3s;
+    }
+}

@@ -1,0 +1,324 @@
+a {
+    text-decoration: none;
+}
+
+ul {
+    list-style: none;
+}
+
+.main {
+    top: 0;
+    min-height: 100vh;
+}
+
+.homeimage {
+    position: relative;
+    height: auto;
+    width: 100%;
+    z-index: -1;
+}
+
+#homeimg {
+    padding-top: 45px;
+    position: relative;
+    width: 100%;
+    min-height: 280px;
+}
+
+.carbattery {
+    position: sticky;
+    background-color: white;
+    border-bottom: 1px solid rgb(116, 116, 116);
+    height: 100%;
+    transition: all 0.3s;
+    position: relative;
+    display: flex;
+    text-align: center;
+}
+
+.device-item {
+    width: 30%;
+    height: auto;
+    position: relative;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    display: inline-block;
+    transition: all .2s ease-out;
+}
+
+.imgbattery {
+    position: sticky;
+    margin-top: 7px;
+    width: 30%;
+    float: left;
+}
+
+#carbatteryh3 {
+    font-size: 10px;
+}
+
+#carbatteryh2 {
+    font-size: 12px;
+}
+
+
+/* Slide device */
+
+#smarthomeh2 {
+    padding-top: 5px;
+    background-color: white;
+    padding-left: 5px;
+    font-size: 12px;
+}
+
+.alldevice {
+    position: sticky;
+    margin-top: -10px;
+    background-color: white;
+    width: 100%;
+}
+
+.moredevices {
+    display: flex;
+    justify-content: center;
+    background-color: white;
+    color: black;
+    padding-left: 5px;
+    border-radius: 5px;
+    margin: 20px;
+}
+
+.moredevices a {
+    color: #727272;
+}
+
+.devices {
+    position: sticky;
+    align-items: stretch;
+    width: 100%;
+    height: auto;
+    text-align: center;
+    transition: all 0.3s;
+    display: flex;
+    overflow-x: auto;
+    position: relative;
+    cursor: grab;
+}
+
+.devices.grabbing {
+    cursor: grabbing;
+}
+
+.devices-item {
+    position: sticky;
+    background-size: cover;
+    box-shadow: 5px dodgerblue;
+    box-shadow: 2px 5px silver;
+    background-color: #bce9e4;
+    width: 35%;
+    text-align: center;
+    display: inline-block;
+    flex-shrink: 0;
+    padding-top: 10px;
+    border-radius: 15px;
+    margin: 0.5%;
+}
+
+#deviceh3 {
+    padding-top: 10px;
+    font-size: 12px;
+}
+
+#imgdevice {
+    position: sticky;
+    display: inline-block;
+    width: 65%;
+    margin: 15%;
+}
+
+.devices-device-item {
+    border: 3px solid rgb(42, 134, 99);
+    border-radius: 100px;
+    background-size: cover;
+    max-width: 60%;
+    height: auto;
+    background-color: white;
+    display: inline-block;
+}
+
+.devices-device-item1 {
+    border: 3px solid rgb(236, 7, 41);
+    border-radius: 100px;
+    background-size: cover;
+    background-color: white;
+    max-width: 60%;
+    height: auto;
+    display: inline-block;
+}
+
+.consumptionNow {
+    display: none;
+}
+
+.prognosis {
+    display: flex;
+    /* border: 1px solid black; */
+    width: 25%;
+    height: 7%;
+    top: 12%;
+    right: 2%;
+    position: absolute;
+    transition: all 0.3s;
+}
+
+.solarPowerNow {
+    display: none;
+}
+
+.prodactionToday {
+    width: 70px;
+    height: 3%;
+    position: absolute;
+    top: 12%;
+    transition: all 0.3s;
+}
+
+.prodactionToday h2,
+h1 {
+    text-align: center;
+    font-size: 8px;
+    transition: all 0.3s;
+}
+
+.tower {
+    width: 30%;
+    margin-top: -30%;
+    margin-left: 0px;
+    position: absolute;
+}
+
+.imgtower {
+    width: 60%;
+}
+
+.no-devices{
+    text-align: center;
+}
+/* Responsiveness */
+
+@media (min-width: 768px) {
+    #smarthomeh2 {
+        padding-left: 55px;
+        font-size: 35px;
+    }
+    .devices-item {
+        width: 25%;
+    }
+    #deviceh3 {
+        padding-top: 10px;
+    }
+    #carbatteryh3 {
+        padding-top: 20px;
+        font-size: 30px;
+    }
+    #carbatteryh2 {
+        font-size: 25px;
+    }
+    .logo {
+        font-size: 60px;
+    }
+    #deviceh3 {
+        font-size: 30px;
+    }
+    .carbatterytree {
+        margin-left: 10%;
+        margin-top: 1%;
+        margin-bottom: 2%;
+    }
+    .prodactionToday {
+        display: flexbox;
+        width: 300px;
+        height: 100px;
+        position: absolute;
+        top: 19%;
+        right: 5px;
+        transition: all 0.3s;
+    }
+    .prodactionToday h2,
+    h1 {
+        text-align: center;
+        font-size: 30px;
+        transition: all 0.3s;
+    }
+    .tower {
+        width: 30%;
+        margin-top: -22%;
+        margin-left: 0px;
+        position: absolute;
+    }
+    .imgtower {
+        width: 50%;
+    }
+    .consumptionNow {
+        display: flexbox;
+        width: 15%;
+        max-height: 20%;
+        top: 30%;
+        display: inline-block;
+        left: 32%;
+        position: absolute;
+        transition: all 0.3s;
+    }
+    .prognosis {
+        display: flex;
+        width: 17%;
+        height: 10%;
+        top: 8%;
+        right: 1%;
+        position: absolute;
+        transition: all 0.3s;
+    }
+    .solarPowerNow {
+        display: flexbox;
+        width: 10%;
+        max-height: 20%;
+        top: 21%;
+        right: 30%;
+        position: absolute;
+        transition: all 0.3s;
+        display: flex;
+    }
+    .powerTransmissiontower {
+        top: 10%;
+        left: 3%;
+        width: 10%;
+        max-height: 20%;
+        text-align: center;
+        display: flex;
+        position: absolute;
+        transition: all 0.3s;
+    }
+    .moredevices a {
+        font-size: 35px;
+        border-bottom: 3px solid #bce9e4;
+    }
+    .moredevices a:hover {
+        border-bottom: 3px solid dodgerblue;
+    }
+    .devices {
+        position: sticky;
+        align-items: stretch;
+        width: 100%;
+        height: auto;
+        text-align: center;
+        transition: all 0.3s;
+        display: flex;
+        overflow-x: scroll;
+        position: relative;
+        cursor: grab;
+    }
+    .devices.grabbing {
+        cursor: grabbing;
+    }
+}
