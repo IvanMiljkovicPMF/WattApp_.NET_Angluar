@@ -13,7 +13,7 @@ import { HistoryPredictionService } from 'src/app/services/history-prediction.se
 })
 export class DeviceTodayTabularComponent {
   maxDate: Date;
-
+  currentDate = new Date();
   consumptionGraph:boolean = false;
   productionGraph:boolean = false;
   datePipe: any;
@@ -23,8 +23,8 @@ export class DeviceTodayTabularComponent {
   }
   list1:DayByHour[] = [];
   list2:DayByHour[] = [];
-  
-  selectedDate!: Date;
+  dateTime:{day:string,hour:string}[] = [];
+  selectedDate: Date = new Date();
 
   onDateSelected(event: { value: Date; }) {
     this.selectedDate = event.value;
@@ -34,23 +34,12 @@ export class DeviceTodayTabularComponent {
   ngOnInit(): void {
     const deviceId = Number(this.route.snapshot.paramMap.get('id'));
     this.authService.getDevice(deviceId).subscribe(data=>{
-      if(this.selectedDate == undefined){
-        if(data.deviceCategory == "Electricity Consumer")
-        {
-          this.deviceService.dayByHourDevice(deviceId).subscribe(consumption=>{
-            this.list1 = consumption;
-            this.consumptionGraph = true;
-          })
-          
-        }
-        else{
-          this.deviceService.dayByHourDevice(deviceId).subscribe(production=>{
-            this.list2 = production;
+        if(data.deviceCategory == "Electricity Consumer"){
+          this.consumptionGraph = true;
+          }
+          else{
             this.productionGraph = true;
-          })
-        }
-      }
-      else if(this.selectedDate !== undefined){
+          }
         const day = this.selectedDate.getDate();
         let dayString = String(day).padStart(2, '0');
         const month = this.selectedDate.getMonth()+1;
@@ -93,21 +82,35 @@ export class DeviceTodayTabularComponent {
         ]).subscribe(([list1, list2]) => {
           if(data.deviceCategory == "Electricity Consumer"){
             this.list1 = list1;
-            this.consumptionGraph = true;
+            this.dateTime = [];
+            for (let i = 0; i < this.list1.length; i++) {
+              const pad = (num: number): string => (num < 10 ? '0' + num : String(num));
+              const formattedHour = `${pad(this.list1[i].hour)}:00:00`;
+              const formattedDay = `${pad(this.list1[i].day)}`;
+              this.dateTime.push({
+                hour : formattedHour,
+                day : formattedDay
+              })
+            }
           }
           else{
             this.list2 = list2;
-            this.productionGraph = true;
+            this.dateTime = [];
+            for (let i = 0; i < this.list2.length; i++) {
+              const pad = (num: number): string => (num < 10 ? '0' + num : String(num));
+              const formattedHour = `${pad(this.list2[i].hour)}:00:00`;
+              const formattedDay = `${pad(this.list2[i].day)}`;
+              this.dateTime.push({
+                hour : formattedHour,
+                day : formattedDay
+              })
+            }
           }
         });
-      }
     })
-    
   }  
   downloadCSV(): void {
   const deviceId = Number(this.route.snapshot.paramMap.get('id'));
-  const date = new Date();
-  const formattedDate = this.datePipe.transform(date,'dd-MM-yyyy hh:mm:ss');
   this.authService.getDevice(deviceId).subscribe(data=>{
     if(data.deviceCategory == "Electricity Consumer"){
         const options = {
@@ -118,12 +121,12 @@ export class DeviceTodayTabularComponent {
         decimalSeparator: '.',
         showLabels: true,
         useTextFile: false,
-        headers: ['Hour', 'Day', 'Month', 'Year', 'Consumption [kWh]', 'Exported Date '+formattedDate]
+        headers: ['Hour', 'Day', 'Month', 'Year', 'Consumption [kWh]']
       };
       const csvExporter = new ExportToCsv(options);
       const csvData = csvExporter.generateCsv(this.list1);
     }
-    else{
+    else if(data.deviceCategory == "Electricity Producer"){
         const options = {
         fieldSeparator: ',',
         filename: 'production-day',
@@ -132,7 +135,7 @@ export class DeviceTodayTabularComponent {
         decimalSeparator: '.',
         showLabels: true,
         useTextFile: false,
-        headers: ['Hour', 'Day', 'Month', 'Year', 'Production [kWh]', 'Exported Date '+formattedDate]
+        headers: ['Hour', 'Day', 'Month', 'Year', 'Production [kWh]']
       };
       const csvExporter = new ExportToCsv(options);
       const csvData = csvExporter.generateCsv(this.list2);

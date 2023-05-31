@@ -30,8 +30,8 @@ export class FiveDayRangeSelectionStrategy<D> implements MatDateRangeSelectionSt
 
   private _createFiveDayRange(date: D | null): DateRange<D> {
     if (date) {
-      const start = this._dateAdapter.addCalendarDays(date, -4);
-      const end = this._dateAdapter.addCalendarDays(date, 3);
+      const start = this._dateAdapter.addCalendarDays(date, 0);
+      const end = this._dateAdapter.addCalendarDays(date, 7);
       return new DateRange<D>(start, end);
     }
 
@@ -52,16 +52,20 @@ export class FiveDayRangeSelectionStrategy<D> implements MatDateRangeSelectionSt
 export class ProsumerWeekTableComponent {
   currentDate = new Date();
   maxDate = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(),this.currentDate.getDate()-7);
+  firstdate = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(),this.currentDate.getDate()-7);
   list1:WeekByDay[] = [];
   list2:WeekByDay[] = [];
+  dateTime: any[] = [];
   mergedList: { day: number, month: string, year: number, consumption: number, production: number }[] = [];
   datePipe: any;
   constructor(private deviceService:HistoryPredictionService,private authService:AuthService,private route:ActivatedRoute) {
     this.campaignOne.valueChanges.subscribe((value) => {
       this.sdate = value.start;
-      this.send = value.end;
-      if(this.send > this.maxDate){
-        this.send = null;
+      if(value.end == null){
+        this.send = this.currentDate;
+      }
+      else{
+        this.send = value.end
       }
       this.ngOnInit();
     });
@@ -72,8 +76,8 @@ export class ProsumerWeekTableComponent {
     end: new FormControl()
   });
 
-  sdate = this.campaignOne.value.start;
-  send = this.campaignOne.value.end;
+  sdate = this.firstdate;
+  send = this.currentDate;
 
   ngOnInit(): void {
     let token=new JwtToken();
@@ -107,6 +111,12 @@ export class ProsumerWeekTableComponent {
             this.deviceService.weekByDayUserFilter(string1,string2,id, 1)
           ]).subscribe(([list1, list2]) => {
             this.list1 = list1;
+            this.dateTime = [];
+            for (let i = 0; i < this.list1.length; i++) {
+              const pad = (num: number): string => (num < 10 ? '0' + num : String(num));
+              const formattedDay = `${pad(this.list1[i].day)}`;
+              this.dateTime.push(formattedDay)
+            }
             this.list2 = list2;
           });
     }
@@ -127,17 +137,15 @@ export class ProsumerWeekTableComponent {
         }
       }
   }
-  const date = new Date();
-  const formattedDate = this.datePipe.transform(date,'dd-MM-yyyy hh:mm:ss');
   const options = {
     fieldSeparator: ',',
-    filename: 'consumption/production-week.csv',
+    filename: 'consumption/production-week',
     quoteStrings: '"',
     useBom : true,
     decimalSeparator: '.',
     showLabels: true,
     useTextFile: false,
-    headers: ['Day', 'Month', 'Year', 'Consumption [kWh]', 'Production [kWh]', 'Exported Date '+formattedDate]
+    headers: ['Day', 'Month', 'Year', 'Consumption [kWh]', 'Production [kWh]']
   };
 
   const csvExporter = new ExportToCsv(options);

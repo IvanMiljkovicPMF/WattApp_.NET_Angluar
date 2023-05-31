@@ -1,5 +1,5 @@
 import { Component, Injectable, ViewChild } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { ExportToCsv } from 'export-to-csv';
 import { Chart,registerables } from 'node_modules/chart.js'
 import { forkJoin } from 'rxjs';
 import { WeekByDay } from 'src/app/models/devices.model';
@@ -16,8 +16,9 @@ export class PredictionDsoComponent {
   loader:boolean=false;
   list1:WeekByDay[] = [];
   list2:WeekByDay[] = [];
+  dayNames: string[] = [];
   settlements:Settlement[] = [];
-
+  mergedList: { day: number, month: string, year: number, consumption: number, production: number }[] = [];
   constructor(private authService:AuthService,private deviceService:HistoryPredictionService){}
 
   selectedOption: number = 0;
@@ -46,6 +47,16 @@ export class PredictionDsoComponent {
         })
         
         if(this.selectedOption == 0){
+          this.dayNames = []
+          const currentDate = new Date();
+          currentDate.setDate(currentDate.getDate())
+          const enddate = new Date()
+          enddate.setDate(enddate.getDate()+6)
+          while (currentDate <= enddate) {
+            const dayName = currentDate.toLocaleDateString('en-US', { weekday: 'short' });
+            this.dayNames.push(dayName);
+            currentDate.setDate(currentDate.getDate() + 1 );
+          }
           forkJoin([
             this.deviceService.predictionCity(number, 2),
             this.deviceService.predictionCity(number, 1)
@@ -58,6 +69,15 @@ export class PredictionDsoComponent {
           
         }
         else{
+          this.dayNames = []
+          const currentDate = new Date();
+          const enddate = new Date()
+          enddate.setDate(enddate.getDate()+6)
+          while (currentDate <= enddate) {
+            const dayName = currentDate.toLocaleDateString('en-US', { weekday: 'short' });
+            this.dayNames.push(dayName);
+            currentDate.setDate(currentDate.getDate() + 1 );
+          }
           forkJoin([
             this.deviceService.predictionSettlement(this.selectedOption, 2),
             this.deviceService.predictionSettlement(this.selectedOption, 1)
@@ -80,7 +100,6 @@ export class PredictionDsoComponent {
     }
 
     const energyUsageResults2 = this.list2.map(day => day.energyUsageResult);
-    const month = this.list2.map(day => day.day);
     let max=0;
     if(energyUsageResults2[0]===0 && energyUsageResults2[1]===0 )
     {
@@ -89,23 +108,27 @@ export class PredictionDsoComponent {
     const Linechart = new Chart("linechart1", {
       type: 'line',
       data : {
-        labels: month,
+        labels: this.dayNames,
         
         datasets:  [
           
           {
             label: 'production',
             data: energyUsageResults2,
-            tension:0.5,
-            backgroundColor: 'rgba(0, 255, 0, 0.2)',
-            borderColor: 'rgba(0, 255, 0, 1)',
-            borderWidth: 2,
-            pointBackgroundColor: 'rgba(0, 255, 0, 1)',
-            pointBorderColor: 'rgba(0, 255, 0, 1)',
-            pointBorderWidth: 7,
-            pointRadius: 5,
+            tension:0.1,
+            backgroundColor: 'rgba(29, 145, 192, 0.2)',
+            borderColor: 'rgba(29, 145, 192, 1)',
+            borderWidth: 1,
+            pointBackgroundColor: 'rgba(29, 145, 192, 1)',
+            pointBorderColor: 'rgba(29, 145, 192, 1)',
+            pointBorderWidth: 8,
+            pointRadius: 1,
             pointHoverRadius: 6,
-            fill:true
+            fill:true,
+            segment:{
+              borderDash:[6,6]
+            }
+            
           }
           
         ]
@@ -113,11 +136,24 @@ export class PredictionDsoComponent {
       }
       ,
       options: {
+        onHover: (e, chartEle) => {
+          if (e.native) {
+            const target = e.native.target as HTMLElement;
+            if (target instanceof HTMLElement) {
+              target.style.cursor = chartEle.length > 0 && chartEle[0] ? 'pointer' : 'default';
+            } else {
+              console.error('Invalid target element:', target);
+            }
+          } else {
+            console.error('Missing native event:', e);
+          }
+        },  
+        maintainAspectRatio:false,
         responsive: true,
         scales:{
           y: {
             ticks:{
-              color:'#000',
+              color:'gray',
               font:{
                 size:15
               }
@@ -125,8 +161,8 @@ export class PredictionDsoComponent {
             position: "left",
             title:{
               display:true,
-              text: "Production (kWh)",
-              color:'#000',
+              text: "Production [kWh]",
+              color:'gray',
               font:{
                 size:15
               }
@@ -135,7 +171,7 @@ export class PredictionDsoComponent {
           ,
           x:{
             ticks:{
-              color:'#000',
+              color:'gray',
               font:{
                 size:15
               }
@@ -143,7 +179,7 @@ export class PredictionDsoComponent {
             title:{
               display:true,
               text: "Days in a week",
-              color:'#000',
+              color:'gray',
               font:{
                 size:15
               }
@@ -151,10 +187,31 @@ export class PredictionDsoComponent {
           }
           ,
         },
-        
+        interaction: {
+          intersect: false,
+          mode: 'index',
+        },
         plugins: {
+          tooltip: {
+            enabled: true,
+            boxHeight:5,
+            boxWidth:5,
+            boxPadding:3
+          },
           datalabels:{display: false},
           legend: {
+            labels:{
+            color:'gray',
+           
+            font:{
+              size:16
+            },
+            boxWidth:15,
+            boxHeight:15,
+            useBorderRadius:true,
+            borderRadius:7
+          },
+            
             position: 'bottom',
             onHover: function (event, legendItem, legend) {
               document.body.style.cursor = 'pointer';
@@ -162,21 +219,11 @@ export class PredictionDsoComponent {
             onLeave: function (event, legendItem, legend) {
                 document.body.style.cursor = 'default';
             },
-            labels:{
-              usePointStyle: true,
-              color:'#000',
-              font:{
-                size:20
-              } 
-           
-            }
-            ,
-            align: "center"
           },
           title: {
             display: true,
             text: 'Production in a week',
-            color:'#000',
+            color:'gray',
             font:{
               size:20
             }
@@ -195,7 +242,6 @@ export class PredictionDsoComponent {
     }
 
     const energyUsageResults1 = this.list1.map(day => day.energyUsageResult);
-    const month = this.list1.map(day => day.day);
     let max=0;
     if(energyUsageResults1[0]===0 && energyUsageResults1[1]===0 )
     {
@@ -204,33 +250,24 @@ export class PredictionDsoComponent {
     const Linechart = new Chart("linechart2", {
       type: 'line',
       data : {
-        labels: month,
+        labels: this.dayNames,
         
         datasets:  [
           {
             label: 'consumption',
             data: energyUsageResults1,
-            backgroundColor: [
-              'rgba(255, 99, 132, 0.2)',
-              'rgba(54, 162, 235, 0.2)',
-              'rgba(255, 206, 86, 0.2)',
-              'rgba(75, 192, 192, 0.2)',
-              'rgba(153, 102, 255, 0.2)',
-              'rgba(255, 159, 64, 0.2)'
-          ],
-          borderColor: [
-              'rgba(255,99,132,1)',
-              'rgba(54, 162, 235, 1)',
-              'rgba(255, 206, 86, 1)',
-              'rgba(75, 192, 192, 1)',
-              'rgba(153, 102, 255, 1)',
-              'rgba(255, 159, 64, 1)'
-          ],
-          pointBorderColor: 'rgba(255,99,132,1)',
-          pointBorderWidth: 7,
-            pointRadius: 5,
-          borderWidth: 2,
-          fill: true
+            backgroundColor: 'rgba(127, 205, 187, 0.2)',
+            borderColor: ' rgba(127, 205, 187, 1)',
+            borderWidth: 2,
+            pointBackgroundColor: 'rgba(127, 205, 187, 1)',
+            pointBorderColor: 'rgba(127, 205, 187, 1)',
+            pointBorderWidth: 8,
+            pointRadius: 1,
+            pointHoverRadius: 6,
+            fill:true,
+            segment:{
+              borderDash:[6,6]
+            }
           },
           
         ]
@@ -238,11 +275,24 @@ export class PredictionDsoComponent {
       }
       ,
       options: {
+        onHover: (e, chartEle) => {
+          if (e.native) {
+            const target = e.native.target as HTMLElement;
+            if (target instanceof HTMLElement) {
+              target.style.cursor = chartEle.length > 0 && chartEle[0] ? 'pointer' : 'default';
+            } else {
+              console.error('Invalid target element:', target);
+            }
+          } else {
+            console.error('Missing native event:', e);
+          }
+        },  
+        maintainAspectRatio:false,
         responsive: true,
         scales:{
           y: {
             ticks:{
-              color:'#000',
+              color:'gray',
               font:{
                 size:15
               }
@@ -250,8 +300,8 @@ export class PredictionDsoComponent {
             position: "left",
             title:{
               display:true,
-              text: "Consumption (kWh)",
-              color:'#000',
+              text: "Consumption [kWh]",
+              color:'gray',
               font:{
                 size:15
               }
@@ -260,7 +310,7 @@ export class PredictionDsoComponent {
           ,
           x:{
             ticks:{
-              color:'#000',
+              color:'gray',
               font:{
                 size:15
               }
@@ -268,7 +318,7 @@ export class PredictionDsoComponent {
             title:{
               display:true,
               text: "Days in a week",
-              color:'#000',
+              color:'gray',
               font:{
                 size:15
               }
@@ -276,10 +326,31 @@ export class PredictionDsoComponent {
           }
           ,
         },
-        
+        interaction: {
+          intersect: false,
+          mode: 'index',
+        },
         plugins: {
+          tooltip: {
+            enabled: true,
+            boxHeight:5,
+            boxWidth:5,
+            boxPadding:3
+          },
           datalabels:{display: false},
           legend: {
+            labels:{
+            color:'gray',
+           
+            font:{
+              size:16
+            },
+            boxWidth:15,
+            boxHeight:15,
+            useBorderRadius:true,
+            borderRadius:7
+          },
+            
             position: 'bottom',
             onHover: function (event, legendItem, legend) {
               document.body.style.cursor = 'pointer';
@@ -287,21 +358,11 @@ export class PredictionDsoComponent {
             onLeave: function (event, legendItem, legend) {
                 document.body.style.cursor = 'default';
             },
-            labels:{
-              usePointStyle: true,
-              color:'#000',
-              font:{
-                size:20
-              } 
-           
-            }
-            ,
-            align: "center"
           },
           title: {
             display: true,
             text: ' Consumption in a week',
-            color:'#000',
+            color:'gray',
             font:{
               size:20
             }
@@ -309,6 +370,37 @@ export class PredictionDsoComponent {
         }
       }
     });
+
+  }
+  downloadCSV(): void {
+    this.mergedList = [];
+    for (let i = 0; i < this.list1.length; i++) {
+      for (let j = 0; j < this.list2.length; j++) {
+        if (this.list1[i].day === this.list2[j].day && this.list1[i].month === this.list2[j].month && this.list1[i].year === this.list2[j].year) {
+          this.mergedList.push({
+            day: this.list1[i].day,
+            month: this.list1[i].month,
+            year: this.list1[i].year,
+            consumption: this.list1[i].energyUsageResult,
+            production: this.list2[j].energyUsageResult
+          });
+          break;
+        }
+      }
+  }
+  const options = {
+    fieldSeparator: ',',
+    filename: 'consumption/production-week',
+    quoteStrings: '"',
+    useBom : true,
+    decimalSeparator: '.',
+    showLabels: true,
+    useTextFile: false,
+    headers: ['Day', 'Month', 'Year', 'Consumption [kWh]', 'Production [kWh]']
+  };
+
+  const csvExporter = new ExportToCsv(options);
+  const csvData = csvExporter.generateCsv(this.mergedList);
 
   }
 }

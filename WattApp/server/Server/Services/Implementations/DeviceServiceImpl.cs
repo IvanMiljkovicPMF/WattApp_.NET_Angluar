@@ -59,9 +59,9 @@ namespace Server.Services.Implementations
 
                 //DeviceBrand
                 command.CommandText = @"select Name 
-                                            from DeviceTypes 
+                                            from DeviceBrands 
                                             where Id in (
-                                                         select DeviceTypeId 
+                                                         select DeviceBrandId 
                                                          from DeviceModels 
                                                          where Id = @id)";
                 //command.Parameters.Add(new SqliteParameter("@id", id));
@@ -77,16 +77,6 @@ namespace Server.Services.Implementations
         /// <inheritdoc/>
         public Device addNewDevice(Device device)
         {
-            /*
-            if (device.EnergyInKwh == null || device.EnergyInKwh == 0)
-            {
-                device.EnergyInKwh = _context.TypeBrandModels.FirstOrDefault(x => x.TypeId == device.DeviceTypeId && x.ModelId == device.DeviceModelId && x.BrandId == x.BrandId).EnergyKwh;
-            }
-            if (device.StandByKwh == null || device.StandByKwh == 0)
-            {
-                device.StandByKwh = _context.TypeBrandModels.FirstOrDefault(x => x.TypeId == device.DeviceTypeId && x.ModelId == device.DeviceModelId && x.BrandId == x.BrandId).StandByKwh;
-            }
-			*/
             long deviceModelId = device.DeviceModelId;
 
             if (device.EnergyInKwh == null || device.EnergyInKwh == 0)
@@ -251,7 +241,15 @@ namespace Server.Services.Implementations
                 query = DeviceFilter.ApplyFilter(query, deviceFilter);
             }
 
-            if (query.Count() == 0) throw new HttpRequestException("There is no devices!", null, System.Net.HttpStatusCode.NotFound);
+            if (query.Count() == 0)
+            {
+                DataPage<DeviceResponseDTO> datapage = new();
+                datapage.Data = new List<DeviceResponseDTO>();
+                datapage.NumberOfPages = 1;
+                datapage.PreviousPage = null;
+                datapage.NextPage = null;
+                return datapage;
+            }
 
             int maxPageNumber;
             if (query.Count() % pageSize == 0) maxPageNumber = query.Count() / pageSize;

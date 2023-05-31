@@ -37,8 +37,7 @@ export const MY_FORMATS = {
 })
 export class ProsumerYearTableComponent {
 
-  currentDate = new Date();
-  maxYear = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth()-1, 1);
+  maxYear = new Date();
   list1:YearsByMonth[]=[];
   list2:YearsByMonth[]=[];
   mergedList: {month: string, year: number, consumption: number, production: number }[] = [];
@@ -53,7 +52,7 @@ export class ProsumerYearTableComponent {
   }
 
   date = new FormControl(moment());
-  selectedDate : Date | undefined;
+  selectedDate : Date = new Date();
   setYear(year: Moment, datepicker: MatDatepicker<Moment>) {
     const ctrlValue = this.date.value!;
     ctrlValue.year(year.year());
@@ -64,17 +63,6 @@ export class ProsumerYearTableComponent {
   ngOnInit(): void {
     let token=new JwtToken();
     const userId = token.data.id as number;
-  
-    if(this.selectedDate == undefined){
-      forkJoin([
-        this.deviceService.yearByMonthUser(userId, 2),
-        this.deviceService.yearByMonthUser(userId, 1)
-      ]).subscribe(([list1, list2]) => {
-        this.list1 = list1;
-        this.list2 = list2;
-      });
-    }
-    else{
       const year = this.selectedDate.getFullYear();
       forkJoin([
         this.deviceService.monthbyDayUserFilter(year,userId, 2),
@@ -83,7 +71,6 @@ export class ProsumerYearTableComponent {
         this.list1 = list1;
         this.list2 = list2;
       });
-    }
   }
   downloadCSV(): void {
     this.mergedList = [];
@@ -100,17 +87,15 @@ export class ProsumerYearTableComponent {
         }
       }
   }
-  const date = new Date();
-  const formattedDate = this.datePipe.transform(date,'dd-MM-yyyy hh:mm:ss');
   const options = {
     fieldSeparator: ',',
-    filename: 'consumption/production-year.csv',
+    filename: 'consumption/production-year',
     quoteStrings: '"',
     useBom : true,
     decimalSeparator: '.',
     showLabels: true,
     useTextFile: false,
-    headers: ['Month', 'Year', 'Consumption [kWh]', 'Production [kWh]', 'Exported Date '+formattedDate]
+    headers: ['Month', 'Year', 'Consumption [kWh]', 'Production [kWh]']
   };
 
   const csvExporter = new ExportToCsv(options);

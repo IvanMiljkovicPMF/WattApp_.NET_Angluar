@@ -2,9 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { YearsByMonth } from 'src/app/models/devices.model';
 import { Settlement } from 'src/app/models/users.model';
 import { AuthService } from 'src/app/services/auth.service';
-import { DevicesService } from 'src/app/services/devices.service';
 import { HistoryPredictionService } from 'src/app/services/history-prediction.service';
-import { saveAs } from 'file-saver';
 import { ExportToCsv } from 'export-to-csv';
 import { forkJoin } from 'rxjs';
 import {FormControl} from '@angular/forms';
@@ -44,8 +42,7 @@ export const MY_FORMATS = {
    ]
 })
 export class TabelarViewByYearComponent implements OnInit{
-  currentDate = new Date();
-  maxYear = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth()-1, 1);
+  maxYear = new Date()
   list1:YearsByMonth[]=[];
   list2:YearsByMonth[]=[];
   settlements:Settlement[] = [];
@@ -67,7 +64,7 @@ export class TabelarViewByYearComponent implements OnInit{
   }
 
   date = new FormControl(moment());
-  selectedDate : Date | undefined;
+  selectedDate : Date = new Date();
   setYear(year: Moment, datepicker: MatDatepicker<Moment>) {
     const ctrlValue = this.date.value!;
     ctrlValue.year(year.year());
@@ -91,17 +88,7 @@ export class TabelarViewByYearComponent implements OnInit{
           }
         }
       })
-      if(this.selectedOption == 0 && this.selectedDate == undefined){
-        forkJoin([
-          this.deviceService.yearByMonth(number, 2),
-          this.deviceService.yearByMonth(number, 1)
-        ]).subscribe(([list1, list2]) => {
-          this.list1 = list1;
-          this.list2 = list2;
-
-        });
-      }
-      else if(this.selectedOption == 0 && this.selectedDate != undefined){
+      if(this.selectedOption == 0 && this.selectedDate != undefined){
         const year = this.selectedDate!.getFullYear();
         forkJoin([
           this.deviceService.monthbyDayCityFilter(year,number, 2),
@@ -124,17 +111,6 @@ export class TabelarViewByYearComponent implements OnInit{
 
         });
       }
-      else{
-        forkJoin([
-          this.deviceService.yearByMonthSettlement(this.selectedOption, 2),
-          this.deviceService.yearByMonthSettlement(this.selectedOption, 1)
-        ]).subscribe(([list1, list2]) => {
-          this.list1 = list1;
-          this.list2 = list2;
-
-        });
-      }
-      
     })
   })
   }
@@ -153,8 +129,6 @@ export class TabelarViewByYearComponent implements OnInit{
         }
       }
   }
-  const date = new Date();
-  const formattedDate = this.datePipe.transform(date,'dd-MM-yyyy hh:mm:ss');
   const options = {
     fieldSeparator: ',',
     filename: 'consumption/production-year',
@@ -163,7 +137,7 @@ export class TabelarViewByYearComponent implements OnInit{
     decimalSeparator: '.',
     showLabels: true,
     useTextFile: false,
-    headers: ['Month', 'Year', 'Consumption [kWh]', 'Production [kWh]', 'Exported Date '+formattedDate]
+    headers: ['Month', 'Year', 'Consumption [kWh]', 'Production [kWh]']
   };
 
   const csvExporter = new ExportToCsv(options);

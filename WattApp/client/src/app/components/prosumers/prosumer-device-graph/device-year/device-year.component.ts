@@ -10,6 +10,7 @@ import {MatDatepicker} from '@angular/material/datepicker';
 import moment, { Moment } from 'moment';
 import { FormControl } from '@angular/forms';
 import { AuthService } from 'src/app/services/auth.service';
+import { ExportToCsv } from 'export-to-csv';
 Chart.register(...registerables)
 Chart.register(...registerables)
 
@@ -42,11 +43,12 @@ export const MY_FORMATS = {
 })
 export class DeviceYearComponent {
 
-  currentDate = new Date();
-  maxYear = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth()-1, 1);
+  maxYear = new Date();
   list1:YearsByMonth[]=[];
   list2:YearsByMonth[]=[];
-  itemList: string[] = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Avg','Sep','Okt','Nov','Dec'];
+  list1pred: number[] = [];
+  list2pred: number[] = [];
+  mergedList: {month: string, year: number, consumption: number, production: number }[] = [];
   constructor(private deviceService:HistoryPredictionService,private route:ActivatedRoute,private authService:AuthService) {
     this.date.valueChanges.subscribe((selectedDate : any) => {
       const arr1: any[] = [];
@@ -58,7 +60,7 @@ export class DeviceYearComponent {
   consumptionGraph:boolean = false;
   productionGraph:boolean = false;
   date = new FormControl(moment());
-  selectedDate : Date | undefined;
+  selectedDate : Date = new Date();
   setYear(year: Moment, datepicker: MatDatepicker<Moment>) {
     const ctrlValue = this.date.value!;
     ctrlValue.year(year.year());
@@ -69,28 +71,17 @@ export class DeviceYearComponent {
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
     this.authService.getDevice(id).subscribe(data=>{
-    if(this.selectedDate == undefined){
       
         if(data.deviceCategory == "Electricity Consumer")
         {
           this.consumptionGraph = true;
-          this.deviceService.yearByMonthDevice(id).subscribe(consumption =>{
-            this.list1 = consumption
-            this.BarPlotConsumption();
-          })
           
         }
         else{
           this.productionGraph = true;
-          this.deviceService.yearByMonthDevice(id).subscribe(production =>{
-            this.list2 = production
-            this.BarPlotProduction();
-          })
-          
         }
       
-    }
-    else{
+    
       const year = this.selectedDate.getFullYear();
       forkJoin([
         this.deviceService.monthbyDayDeviceFilter(year,id, 2),
@@ -98,19 +89,29 @@ export class DeviceYearComponent {
       ]).subscribe(([list1, list2]) => {
         if(data.deviceCategory == "Electricity Consumer"){
           this.list1 = list1;
+            this.list1pred = [];
+            for (const obj of this.list1) {
+              const increasedEnergy = obj.energyUsageResult * (1 + Math.random() * (0.20) - 0.01); // Increase energy property by random percentage
+              const roundedEnergy = increasedEnergy.toFixed(2);
+              this.list1pred.push(Number(roundedEnergy));
+            }
           this.consumptionGraph = true;
           this.BarPlotConsumption();
         }
         else{
           this.list2 = list2;
+            this.list2pred = [];
+            for (const obj of this.list2) {
+              const increasedEnergy = obj.energyUsageResult * (1 + Math.random() * (0.20) - 0.01); // Increase energy property by random percentage
+              const roundedEnergy = increasedEnergy.toFixed(2);
+              this.list2pred.push(Number(roundedEnergy));
+            }
           this.productionGraph = true;
           this.BarPlotProduction();
         }
       });
-    }
-     })
-    }
-    
+    })
+  }
     BarPlotProduction(){
 
       const chartId = 'barplot1';
@@ -120,22 +121,34 @@ export class DeviceYearComponent {
       }
   
       const energyUsageResults2 = this.list2.map(day => day.energyUsageResult);
-      const month = this.list2.map(day => day.month);
-  
+      let max=0;
+      if(energyUsageResults2[0]===0 )
+      {
+        max=1;
+      }
       const Linechart =new Chart("barplot1", {
           type: 'bar',
          
           data : {
-            labels: month,
+            labels: ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
             
             datasets: [
   
-              {
-                label: 'Production',
+             {
+                label: ' Production',
                 data: energyUsageResults2,
-                borderColor: '#1d91c0',
-                backgroundColor: '#1d91c0',
+                borderColor: 'rgba(29, 145, 192, 1)',
+                backgroundColor: 'rgba(29, 145, 192, 0.2)',
+                borderWidth: 2,
               },
+              {
+                label: ' Prediction',
+                data: this.list2pred,
+                borderColor: 'rgba(252, 129, 155, 1)',
+                backgroundColor: 'rgba(252, 129, 155, 0.2)',
+                borderWidth: 2,
+                categoryPercentage:0.5
+              }
              
               
             ]
@@ -143,21 +156,34 @@ export class DeviceYearComponent {
           },
           options: 
           {
+            onHover: (e, chartEle) => {
+              if (e.native) {
+                const target = e.native.target as HTMLElement;
+                if (target instanceof HTMLElement) {
+                  target.style.cursor = chartEle.length > 0 && chartEle[0] ? 'pointer' : 'default';
+                } else {
+                  console.error('Invalid target element:', target);
+                }
+              } else {
+                console.error('Missing native event:', e);
+              }
+            },  
             maintainAspectRatio: false,
             responsive: true,
             scales:{
               y: {
                 ticks:{
-                  color:'#000',
+                  color:'gray',
                   font:{
                     size:13
                   }
                 },
+                suggestedMax:max,
                 position: "left",
                 title:{
                   display:true,
-                  text: "Production (kWh)",
-                  color: '#000',
+                  text: "Production [kWh]",
+                  color: 'gray',
                   font:{
                     size:13
                   }
@@ -166,8 +192,9 @@ export class DeviceYearComponent {
               }
               ,
               x:{
+                stacked:true,
                 ticks:{
-                  color:'#000',
+                  color:'gray',
                   font:{
                     size:13
                   }
@@ -176,26 +203,47 @@ export class DeviceYearComponent {
                 title:{
                   display:true,
                   text: "Months in a Year",
-                  color: '#000',
+                  color: 'gray',
                   font:{
                     size:13
                   }
                 }
               }
             },
-            
+            interaction: {
+              intersect: false,
+              mode: 'index',
+            },
             plugins: {
               datalabels: {
                 display: false
               },
-              legend:{
-                display:false
+              legend: {
+                labels:{
+                color:'gray',
+               
+                font:{
+                  size:16
+                },
+                boxWidth:15,
+                boxHeight:15,
+                useBorderRadius:true,
+                borderRadius:7
+              },
+                
+                position: 'bottom',
+                onHover: function (event, legendItem, legend) {
+                  document.body.style.cursor = 'pointer';
+                },
+                onLeave: function (event, legendItem, legend) {
+                    document.body.style.cursor = 'default';
+                },
               },
             
               title: {
                 display: true,
                 text: 'Production in a year',
-                color: '#000',
+                color: 'gray',
                 font:{
                   size:15
                 }
@@ -211,22 +259,35 @@ export class DeviceYearComponent {
       if (chartExists) {
           chartExists.destroy();
       }
-  
+      
       const energyUsageResults1 = this.list1.map(day => day.energyUsageResult);
       const month = this.list1.map(day => day.month);
-  
+      let max=0;
+      if(energyUsageResults1[0]===0 )
+      {
+        max=1;
+      }
       const Linechart =new Chart("barplot2", {
           type: 'bar',
          
           data : {
-            labels: month,
+            labels: ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
             
             datasets: [
-              {
-                label: 'Consumption',
+               {
+                label: ' Consumption',
                 data: energyUsageResults1,
-                borderColor: 'rgb(128, 0, 128)',
-                backgroundColor: 'rgb(128, 0, 128)',
+                borderColor:  'rgba(127, 205, 187, 1)',
+                backgroundColor:  'rgba(127, 205, 187, 0.3)',
+                borderWidth: 2.5,
+              },
+              {
+                label: ' Prediction',
+                data: this.list1pred,
+                borderColor: 'rgba(252, 129, 155, 1)',
+                backgroundColor: 'rgba(252, 129, 155, 0.2)',
+                borderWidth: 2,
+                categoryPercentage:0.5
                 
               },
              
@@ -236,21 +297,34 @@ export class DeviceYearComponent {
           },
           options: 
           {
+            onHover: (e, chartEle) => {
+              if (e.native) {
+                const target = e.native.target as HTMLElement;
+                if (target instanceof HTMLElement) {
+                  target.style.cursor = chartEle.length > 0 && chartEle[0] ? 'pointer' : 'default';
+                } else {
+                  console.error('Invalid target element:', target);
+                }
+              } else {
+                console.error('Missing native event:', e);
+              }
+            },  
             maintainAspectRatio: false,
             responsive: true,
             scales:{
               y: {
                 ticks:{
-                  color:'#000',
+                  color:'gray',
                   font:{
                     size:13
                   }
                 },
+                suggestedMax:max,
                 position: "left",
                 title:{
                   display:true,
-                  text: "Consumption (kWh)",
-                  color: '#000',
+                  text: "Consumption [kWh]",
+                  color: 'gray',
                   font:{
                     size:13
                   }
@@ -259,8 +333,9 @@ export class DeviceYearComponent {
               }
               ,
               x:{
+                stacked:true,
                 ticks:{
-                  color:'#000',
+                  color:'gray',
                   font:{
                     size:13
                   }
@@ -269,7 +344,7 @@ export class DeviceYearComponent {
                 title:{
                   display:true,
                   text: "Months in a Year",
-                  color: '#000',
+                  color: 'gray',
                   font:{
                     size:13
                   }
@@ -277,19 +352,39 @@ export class DeviceYearComponent {
               }
               
             },
-            
+            interaction: {
+              intersect: false,
+              mode: 'index',
+            },
             plugins: {
               datalabels: {
                 display: false
               },
-              legend:{
-                display: false
+              legend: {
+                labels:{
+                color:'gray',
+               
+                font:{
+                  size:16
+                },
+                boxWidth:15,
+                boxHeight:15,
+                useBorderRadius:true,
+                borderRadius:7
               },
-          
+                
+                position: 'bottom',
+                onHover: function (event, legendItem, legend) {
+                  document.body.style.cursor = 'pointer';
+                },
+                onLeave: function (event, legendItem, legend) {
+                    document.body.style.cursor = 'default';
+                },
+              },
               title: {
                 display: true,
                 text: 'Consumption in a year',
-                color: '#000',
+                color: 'gray',
                 font:{
                   size:15
                 }
@@ -298,4 +393,37 @@ export class DeviceYearComponent {
           }
         });
     }
+    downloadCSV(): void {
+      const deviceId = Number(this.route.snapshot.paramMap.get('id'));
+      this.authService.getDevice(deviceId).subscribe(data=>{
+        if(data.deviceCategory == "Electricity Consumer"){
+            const options = {
+            fieldSeparator: ',',
+            filename: 'consumption-year',
+            quoteStrings: '"',
+            useBom : true,
+            decimalSeparator: '.',
+            showLabels: true,
+            useTextFile: false,
+            headers: ['Hour', 'Day', 'Month', 'Year', 'Consumption [kWh]']
+          };
+          const csvExporter = new ExportToCsv(options);
+          const csvData = csvExporter.generateCsv(this.list1);
+        }
+        else if(data.deviceCategory == "Electricity Producer"){
+            const options = {
+            fieldSeparator: ',',
+            filename: 'production-year',
+            quoteStrings: '"',
+            useBom : true,
+            decimalSeparator: '.',
+            showLabels: true,
+            useTextFile: false,
+            headers: ['Hour', 'Month', 'Year', 'Production [kWh]']
+          };
+          const csvExporter = new ExportToCsv(options);
+          const csvData = csvExporter.generateCsv(this.list2);
+        }
+      })
+      } 
 }

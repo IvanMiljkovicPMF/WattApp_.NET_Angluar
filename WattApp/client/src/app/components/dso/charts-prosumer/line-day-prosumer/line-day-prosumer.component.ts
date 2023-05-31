@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { ExportToCsv } from 'export-to-csv';
 import { Chart,registerables } from 'node_modules/chart.js'
-import { combineLatest, forkJoin } from 'rxjs';
+import { forkJoin } from 'rxjs';
 import { DayByHour } from 'src/app/models/devices.model';
 import { HistoryPredictionService } from 'src/app/services/history-prediction.service';
 Chart.register(...registerables)
@@ -13,14 +14,16 @@ Chart.register(...registerables)
 })
 export class LineDayProsumerComponent{
   maxDate: Date;
-
+  currentDate = new Date();
+  mergedList: { hour: number, day: number, month: string, year: number, consumption: number, production: number}[] = [];
   constructor(private route:ActivatedRoute,private deviceService:HistoryPredictionService) {
     this.maxDate = new Date();
   }
   list1:DayByHour[] = [];
   list2:DayByHour[] = [];
-  
-  selectedDate!: Date;
+  list1pred: number[] = [];
+  list2pred: number[] = [];
+  selectedDate: Date = new Date();
 
   onDateSelected(event: { value: Date; }) {
     this.selectedDate = event.value;
@@ -30,18 +33,6 @@ export class LineDayProsumerComponent{
   ngOnInit(): void {
     const userId = Number(this.route.snapshot.paramMap.get('id'));
   
-    if(this.selectedDate == undefined){
-      combineLatest([
-        this.deviceService.dayByHourUser(userId, 2),
-        this.deviceService.dayByHourUser(userId, 1)
-      ]).subscribe(([list1, list2]) => {
-        this.list1 = list1;
-        this.list2 = list2;
-        this.LineChartProduction();
-        this.LineChartConsumption();
-      });
-    }
-    else if(this.selectedDate !== undefined){
       const day = this.selectedDate.getDate();
       let dayString = String(day).padStart(2, '0');
       const month = this.selectedDate.getMonth()+1;
@@ -83,12 +74,22 @@ export class LineDayProsumerComponent{
         this.deviceService.dayByHourUserFilter(string1,string2,userId, 1)
       ]).subscribe(([list1, list2]) => {
         this.list1 = list1;
-        this.list2 = list2;
+            this.list1pred = [];
+            for (const obj of this.list1) {
+              const increasedEnergy = obj.energyUsageResult * (1 + Math.random() * (0.20) - 0.01);
+              const roundedEnergy = increasedEnergy.toFixed(2);
+              this.list1pred.push(Number(roundedEnergy));
+            }
+            this.list2 = list2;
+            this.list2pred = [];
+            for (const obj of this.list2) {
+              const increasedEnergy = obj.energyUsageResult * (1 + Math.random() * (0.20) - 0.01);
+              const roundedEnergy = increasedEnergy.toFixed(2);
+              this.list2pred.push(Number(roundedEnergy));
+            }
         this.LineChartProduction();
         this.LineChartConsumption();
       });
-    }
-    
   }
   LineChartProduction(){
 
@@ -100,41 +101,69 @@ export class LineDayProsumerComponent{
     const energyUsageResults2 = this.list2.map(day => day.energyUsageResult);
     const hours = this.list2.map(day => day.hour);
     let max=0;
-    if(energyUsageResults2[0]===0 && energyUsageResults2[1]===0 )
+    if(energyUsageResults2[0]===0 )
     {
       max=1;
     }
     const Linechart =new Chart("linechart1", {
       type: 'line',
       data : {
-        labels: ["0","4","8","12","16","20"," "],
+        labels: hours,
         
         datasets: [
           {
-            label: 'production',
+            label: ' Production',
             data: energyUsageResults2,
-            tension:0.5,
-            backgroundColor: 'rgba(0, 255, 0, 0.2)',
-            borderColor: 'rgba(0, 255, 0, 1)',
-            borderWidth: 2,
-            pointBackgroundColor: 'rgba(0, 255, 0, 1)',
-            pointBorderColor: 'rgba(0, 255, 0, 1)',
-            pointBorderWidth: 7,
-            pointRadius: 5,
+            backgroundColor: 'rgba(29, 145, 192, 0.2)',
+            borderColor: 'rgba(29, 145, 192, 1)',
+            borderWidth: 1,
+            pointBackgroundColor: 'rgba(29, 145, 192, 1)',
+            pointBorderColor: 'rgba(29, 145, 192, 1)',
+            pointBorderWidth: 8,
+            pointRadius: 1,
             pointHoverRadius: 6,
-            fill:true
-          }
+            fill:true,
+            
+          },
+          {
+            label: ' Prediction',
+            data: this.list2pred,
+            borderColor: 'rgba(252, 129, 155, 1)',
+            borderWidth: 2,
+            pointBackgroundColor: 'rgba(252, 129, 155, 1)',
+            pointBorderColor: 'rgba(252, 129, 155, 1)',
+            pointBorderWidth: 8,
+            pointRadius: 1,
+            pointHoverRadius: 6,
+            segment:{
+              borderDash:[6,6]
+            }
+            
+          },
           
         ]
         
       }
       ,
       options: {
+        onHover: (e, chartEle) => {
+          if (e.native) {
+            const target = e.native.target as HTMLElement;
+            if (target instanceof HTMLElement) {
+              target.style.cursor = chartEle.length > 0 && chartEle[0] ? 'pointer' : 'default';
+            } else {
+              console.error('Invalid target element:', target);
+            }
+          } else {
+            console.error('Missing native event:', e);
+          }
+        },  
+        maintainAspectRatio:false,
         responsive: true,
         scales:{
           y: {
             ticks:{
-              color:'#000',
+              color:'gray',
               font:{
                 size:15
               }
@@ -142,8 +171,8 @@ export class LineDayProsumerComponent{
             position: "left",
             title:{
               display:true,
-              text: "Production (kWh)",
-              color:'#000',
+              text: "Production [kWh]",
+              color:'gray',
               font:{
                 size:15
               }
@@ -152,7 +181,7 @@ export class LineDayProsumerComponent{
           ,
           x:{
             ticks:{
-              color:'#000',
+              color:'gray',
               font:{
                 size:15
               }
@@ -160,7 +189,7 @@ export class LineDayProsumerComponent{
             title:{
               display:true,
               text: "Hours in a day",
-              color:'#000',
+              color:'gray',
               font:{
                 size:15
               }
@@ -168,10 +197,31 @@ export class LineDayProsumerComponent{
           }
           ,
         },
-        
+        interaction: {
+          intersect: false,
+          mode: 'index',
+        },
         plugins: {
+          tooltip: {
+            enabled: true,
+            boxHeight:5,
+            boxWidth:5,
+            boxPadding:3
+          },
           datalabels:{display: false},
           legend: {
+            labels:{
+            color:'gray',
+           
+            font:{
+              size:16
+            },
+            boxWidth:15,
+            boxHeight:15,
+            useBorderRadius:true,
+            borderRadius:7
+          },
+            
             position: 'bottom',
             onHover: function (event, legendItem, legend) {
               document.body.style.cursor = 'pointer';
@@ -179,22 +229,12 @@ export class LineDayProsumerComponent{
             onLeave: function (event, legendItem, legend) {
                 document.body.style.cursor = 'default';
             },
-            labels:{
-              usePointStyle: true,
-              color:'#000',
-              font:{
-                size:15
-              } 
-           
-            }
-            ,
-            align: "center"
           },
           title: {
             
             display: true,
             text: 'Production in one day',
-            color: '#000',
+            color: 'gray',
             font:{
               size:20
             }
@@ -214,7 +254,7 @@ export class LineDayProsumerComponent{
     const energyUsageResults1 = this.list1.map(day => day.energyUsageResult);
     const hours = this.list1.map(day => day.hour);
     let max=0;
-    if(energyUsageResults1[0]===0 && energyUsageResults1[1]===0 )
+    if(energyUsageResults1[0]===0 )
     {
       max=1;
     }
@@ -225,40 +265,57 @@ export class LineDayProsumerComponent{
         
         datasets: [
           {
-            label: 'consumption',
+            label: ' Consumption ',
             data: energyUsageResults1,
-            backgroundColor: [
-              'rgba(255, 99, 132, 0.2)',
-              'rgba(54, 162, 235, 0.2)',
-              'rgba(255, 206, 86, 0.2)',
-              'rgba(75, 192, 192, 0.2)',
-              'rgba(153, 102, 255, 0.2)',
-              'rgba(255, 159, 64, 0.2)'
-          ],
-          borderColor: [
-              'rgba(255,99,132,1)',
-              'rgba(54, 162, 235, 1)',
-              'rgba(255, 206, 86, 1)',
-              'rgba(75, 192, 192, 1)',
-              'rgba(153, 102, 255, 1)',
-              'rgba(255, 159, 64, 1)'
-          ],
-          pointBorderColor: 'rgba(255,99,132,1)',
-          pointBorderWidth: 7,
-            pointRadius: 5,
-          borderWidth: 2,
-          fill: true
+            backgroundColor: 'rgba(127, 205, 187, 0.3)',
+            borderColor: ' rgba(127, 205, 187, 1)',
+            borderWidth: 1.5,
+            pointBackgroundColor: 'rgba(127, 205, 187, 1)',
+            pointBorderColor: 'rgba(127, 205, 187, 1)',
+            pointBorderWidth: 8,
+            pointRadius: 1,
+            pointHoverRadius: 6,
+            fill:true,
+            
+          },
+          {
+            label: ' Prediction',
+            data: this.list1pred,
+            borderColor: 'rgba(252, 129, 155, 1)',
+            borderWidth: 2,
+            pointBackgroundColor: 'rgba(252, 129, 155, 1)',
+            pointBorderColor: 'rgba(252, 129, 155, 1)',
+            pointBorderWidth: 8,
+            pointRadius: 1,
+            pointHoverRadius: 6,
+            segment:{
+              borderDash:[6,6]
+            }
+            
           },
         ]
         
       }
       ,
       options: {
+        onHover: (e, chartEle) => {
+          if (e.native) {
+            const target = e.native.target as HTMLElement;
+            if (target instanceof HTMLElement) {
+              target.style.cursor = chartEle.length > 0 && chartEle[0] ? 'pointer' : 'default';
+            } else {
+              console.error('Invalid target element:', target);
+            }
+          } else {
+            console.error('Missing native event:', e);
+          }
+        },     
+        maintainAspectRatio:false,
         responsive: true,
         scales:{
           y: {
             ticks:{
-              color:'#000',
+              color:'gray',
               font:{
                 size:15
               }
@@ -266,8 +323,8 @@ export class LineDayProsumerComponent{
             position: "left",
             title:{
               display:true,
-              text: "Consumption (kWh)",
-              color:'#000',
+              text: "Consumption [kWh]",
+              color:'gray',
               font:{
                 size:15
               }
@@ -276,7 +333,7 @@ export class LineDayProsumerComponent{
           ,
           x:{
             ticks:{
-              color:'#000',
+              color:'gray',
               font:{
                 size:15
               }
@@ -284,7 +341,7 @@ export class LineDayProsumerComponent{
             title:{
               display:true,
               text: "Hours in a day",
-              color:'#000',
+              color:'gray',
               font:{
                 size:15
               }
@@ -292,10 +349,31 @@ export class LineDayProsumerComponent{
           }
           ,
         },
-        
+        interaction: {
+          intersect: false,
+          mode: 'index',
+        },
         plugins: {
+          tooltip: {
+            enabled: true,
+            boxHeight:5,
+            boxWidth:5,
+            boxPadding:3
+          },
           datalabels:{display: false},
           legend: {
+            labels:{
+            color:'gray',
+           
+            font:{
+              size:16
+            },
+            boxWidth:15,
+            boxHeight:15,
+            useBorderRadius:true,
+            borderRadius:7
+          },
+            
             position: 'bottom',
             onHover: function (event, legendItem, legend) {
               document.body.style.cursor = 'pointer';
@@ -303,22 +381,12 @@ export class LineDayProsumerComponent{
             onLeave: function (event, legendItem, legend) {
                 document.body.style.cursor = 'default';
             },
-            labels:{
-              usePointStyle: true,
-              color:'#000',
-              font:{
-                size:15
-              } 
-           
-            }
-            ,
-            align: "center"
           },
           title: {
             
             display: true,
             text: 'Consumption in one day',
-            color: '#000',
+            color: 'gray',
             font:{
               size:20
             }
@@ -326,6 +394,39 @@ export class LineDayProsumerComponent{
         }
       }
     });
+
+  }
+  downloadCSV(): void {
+    this.mergedList = [];
+    for (let i = 0; i < this.list1.length; i++) {
+      for (let j = 0; j < this.list2.length; j++) {
+        if (this.list1[i].hour === this.list2[j].hour && this.list1[i].day === this.list2[j].day && this.list1[i].month === this.list2[j].month && this.list1[i].year === this.list2[j].year) {
+          this.mergedList.push({
+            hour: this.list1[i].hour,
+            day: this.list1[i].day,
+            month: this.list1[i].month,
+            year: this.list1[i].year,
+            consumption: this.list1[i].energyUsageResult,
+            production: this.list2[j].energyUsageResult
+          });
+          break;
+        }
+      }
+  }
+  const options = {
+    fieldSeparator: ',',
+    filename: 'consumption/production-day',
+    quoteStrings: '"',
+    useBom : true,
+    decimalSeparator: '.',
+    showLabels: true,
+    useTextFile: false,
+    headers: ['Hour', 'Day', 'Month', 'Year', 'Consumption [kWh]', 'Production [kWh]']
+  };
+
+  const csvExporter = new ExportToCsv(options);
+
+  const csvData = csvExporter.generateCsv(this.mergedList);
 
   }
 }

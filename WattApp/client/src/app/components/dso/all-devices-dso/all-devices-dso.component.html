@@ -1,31 +1,99 @@
 <div class="containers">
-  <!-- <div class="search">
-    <input type="text" placeholder="Search...">
-  </div> -->
-  <div class="sort-by">
-      <select id="deviceCategoryId" class="form-control" name="deviceCategoryId" (change)="onSelectedCategory($event)" [(ngModel)]="deviceCategoryId" required>
+
+  <div class="filters">
+    <div class="device-number">
+      <h2>Devices ({{numberOfDevices}})</h2>
+    </div>
+
+    <div class="first-row">
+      <div class="form-group">
+        <label for="dropdown ">Select by Category:</label>
+        <select class="form-select" id="dropdown" style="cursor: pointer;" (change)="onSelectedCategory($event)" [(ngModel)]="filters.categoryId" required>
+          <option value="0">-- Category --</option>  
           <option *ngFor="let category of categories" [value]="category.id" >{{category.name}}</option>
-      </select>
-    <!-- <select>
-      <option value="asc">Ascending</option>
-      <option value="desc">Descending</option>
-    </select>
-    <select>
-      <option value="10">10 per page</option>
-      <option value="20">20 per page</option>
-      <option value="50">50 per page</option>
-    </select> -->
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="dropdown">Filter by Device Type</label>
+        <select class="form-select" (change)="onSelectedType($event)" [(ngModel)]="filters.typeId">
+          <option value="0">-- Device Type --</option>
+          <option *ngFor="let type of types" [value]="type.id" >{{type.name}}</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="dropdown">Filter by Device Brand</label>
+        <select class="form-select" [(ngModel)]="filters.brandId" (change)="onSelectedBrand($event)">
+          <option value="0">-- Device brand --</option>
+          <option *ngFor="let brand of brands" [value]="brand.id">{{brand.name}}</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="dropdown">Filter by Device Status</label>
+        <select class="form-select" [(ngModel)]="filters.turnOn" (change)="onSelectedTurnOn($event)">
+          <option value="-1">-- On/Off --</option>
+          <option value="1">Turn On</option>
+          <option value="0">Turn Off</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="dropdown">Filter by Device Type</label>
+        <select class="form-select" [(ngModel)]="filters.controlability" (change)="onSelectedControlability($event)">
+          <option value="-1">-- Controllability --</option>
+          <option value="1">Allowed</option>
+          <option value="0">Forbbidn</option>
+        </select>
+      </div>
+
+      <div class="filters-clear">
+        <a (click)="clearFilters()" role="button" class="clear-filters">Clear filters</a>
+      </div>
+    </div>
+
+    <div class="second-row">
+      Consumption/Production 
+      <div class="form-group-consumption">
+        <select class="form-select" [(ngModel)]="filters.greaterThan" (click)="onSelectedGreaterThan($event)">
+          <option value="1">Greater</option>
+          <option value="0">Less or equal</option>
+        </select>
+      </div>
+
+      than 
+      <div class="form-group-value" id="inputEnergyInKwh" >
+        <input class="custom-input" type="number" placeholder="Enter value" min="0" pattern="\d+(\.\d+)?" (input)="validateFormInput($event.target)" [(ngModel)]="filters.energyInKwhValue" (input)="onSelectedEnergyInKwhValue($event)">
+      </div>
+
+      <div class="filters-clear" id="reset">
+        <a (click)="reset()" role="button" class="clear-filters" id="reset">Reset</a>
+      </div>
+    
+      <div class="search">
+        <input type="text" class="custom-input" id="search" placeholder="Search devices by name" (input)="onSelectedSearchValue($event)" [(ngModel)]="filters.searchValue">
+      </div>
+
+      
+    </div>
+    
+    
+
   </div>
+
+
   <div class="table">
           <table>
             <thead>
               <tr>
                 <th>#</th>
-                <th>Device Type</th>
-                <th>Device Brand</th>
-                <th>Device Model</th>
-                <th>Device Name</th>
-                <th>Device Consumption</th>
+                <th>Type</th>
+                <th>Brand</th>
+                <th>Model</th>
+                <th>Name</th>
+                <th *ngIf="deviceCategory===false">Consumption</th>
+                <th *ngIf="deviceCategory===true">Production</th>
                 <th>On/Off</th>
               </tr>
             </thead>

@@ -22,12 +22,7 @@
             Reset password
             </summary>
         </member>
-        <member name="M:Server.Controllers.CurrentPeriodHistoryController.GetHistoryForDeviceFromCurrentYear(System.Int64,System.Int64,System.Int64,System.Int64,System.Int64)">
-            <summary>
-            Device Consumption/Production for current year, month, day
-            </summary>
-        </member>
-        <member name="M:Server.Controllers.CurrentPeriodHistoryController.GetHistoryForProsumerFromCurrentYear(System.Int64,System.Int64,System.Int64,System.Int64,System.Int64,System.Int64,System.Int64)">
+        <member name="M:Server.Controllers.CurrentPeriodHistoryController.GetHistoryForProsumerFromCurrentYear(System.Int64,System.Int64,System.Int64,System.Int64)">
             <summary>
             Prosumer Consumption/Production for current year, month, day
             </summary>
@@ -80,7 +75,7 @@
             Change visibility status of device (DSO + PROSUMER)
             </summary>
         </member>
-        <member name="M:Server.Controllers.DSOController.GetSettlements(System.Int64,System.Int64,System.Int64)">
+        <member name="M:Server.Controllers.DSOController.GetSettlements(System.Int64)">
             <summary>
             1.) Get (settlementId, settlementName) --- 2.) Consumption/Production for settlement - today by hour
             </summary>
@@ -95,34 +90,9 @@
             Pagination for table
             </summary>
         </member>
-        <member name="M:Server.Controllers.HistoryController.GetHistoryForDeviceInLastYear(System.Int64)">
-            <summary>
-            Total device Consumption/Production in last year
-            </summary>
-        </member>
-        <member name="M:Server.Controllers.HistoryController.GetHistoryForDeviceInLastMonth(System.Int64)">
-            <summary>
-            Total device Consumption/Production in last month
-            </summary>
-        </member>
-        <member name="M:Server.Controllers.HistoryController.GetHistoryForDeviceInLastDay(System.Int64)">
-            <summary>
-            Total device Consumption/Production in last day
-            </summary>
-        </member>
-        <member name="M:Server.Controllers.HistoryController.GetHistoryForDeviceInPastWeek(System.Int64)">
-            <summary>
-            Total device Consumption/Production in last week
-            </summary>
-        </member>
         <member name="M:Server.Controllers.HistoryController.GetHistoryForDeviceInPastYearByMonth(System.Int64)">
             <summary>
             Consumption/Production history for device in past year by month
-            </summary>
-        </member>
-        <member name="M:Server.Controllers.HistoryController.GetHistoryForDeviceInPastMonthByDay(System.Int64)">
-            <summary>
-            Consumption/Production history for device in past month by day
             </summary>
         </member>
         <member name="M:Server.Controllers.HistoryController.GetHistoryForDeviceInPastWeekByDay(System.Int64)">
@@ -130,39 +100,9 @@
             Consumption/Production history for device in past week by day
             </summary>
         </member>
-        <member name="M:Server.Controllers.HistoryController.GetTotalConsumptionByUser(System.Int64,System.Int64)">
-            <summary>
-            Consumption/Production for all user`s devices
-            </summary>
-        </member>
-        <member name="M:Server.Controllers.HistoryController.GetHistoryByUserForPastDay(System.Int64,System.Int64)">
-            <summary>
-            Consumption/Production for user, past day
-            </summary>
-        </member>
-        <member name="M:Server.Controllers.HistoryController.GetHistoryByUserForPastWeek(System.Int64,System.Int64)">
-            <summary>
-            Consumption/Production for user in past week
-            </summary>
-        </member>
-        <member name="M:Server.Controllers.HistoryController.GetHistoryByUserForPastMonth(System.Int64,System.Int64)">
-            <summary>
-            Consumption/Production for user in past month
-            </summary>
-        </member>
-        <member name="M:Server.Controllers.HistoryController.GetConsumptionByUserForYear(System.Int64,System.Int64)">
-            <summary>
-            Consumption/Production for user in past year
-            </summary>
-        </member>
         <member name="M:Server.Controllers.HistoryController.GetConsumptionByUserForYearByMonth(System.Int64,System.Int64)">
             <summary>
             Consumption/Production for all user`s devices in past year (by month)
-            </summary>
-        </member>
-        <member name="M:Server.Controllers.HistoryController.GetUserHistoryForPastMonthByDay(System.Int64,System.Int64)">
-            <summary>
-            Consumption/Production for all user`s devices for last month (by day)
             </summary>
         </member>
         <member name="M:Server.Controllers.HistoryController.GetUserHistoryForPastWeekByDay(System.Int64,System.Int64)">
@@ -170,67 +110,17 @@
             Consumption/Production for all user`s devices for last week (by day)
             </summary>
         </member>
-        <member name="M:Server.Controllers.HistoryController.GetUserHistoryForPastDayByHour(System.Int64,System.Int64)">
-            <summary>
-            Consumption/Production for user (yesterday by hour)
-            </summary>
-        </member>
-        <member name="M:Server.Controllers.HistoryController.GetSettlementHistoryForPastWeekByDay(System.Int64,System.Int64)">
-            <summary>
-            Consumption/Production for all users from settlement for last week (by day)
-            </summary>
-        </member>
-        <member name="M:Server.Controllers.HistoryController.GetCityHistoryForPastWeekByDay(System.Int64,System.Int64)">
-            <summary>
-            Consumption/Production for all users from city for last week (by day)
-            </summary>
-        </member>
-        <member name="M:Server.Controllers.HistoryController.GetSettlementHistoryForPastMonthByDay(System.Int64,System.Int64)">
-            <summary>
-            Consumption/Production for all users from settlement for last month (by day)
-            </summary>
-        </member>
-        <member name="M:Server.Controllers.HistoryController.GetCityHistoryForPastMonthByDay(System.Int64,System.Int64)">
-            <summary>
-            Consumption/Production for all users from city for last month (by day)
-            </summary>
-        </member>
-        <member name="M:Server.Controllers.HistoryController.GetCityHistoryForPastYearByMonth(System.Int64,System.Int64)">
-            <summary>
-            Consumption/Production for all users from city for last year (by month)
-            </summary>
-        </member>
-        <member name="M:Server.Controllers.HistoryController.GetSettlementHistoryForPastYearByMonth(System.Int64,System.Int64)">
-            <summary>
-            Consumption/Production for all users from settlement for last year (by month)
-            </summary>
-        </member>
-        <member name="M:Server.Controllers.HistoryController.GetHistoryForDeviceInThisMonth(System.Int64)">
-            <summary>
-            Total device Consumption/Production in this month
-            </summary>
-        </member>
         <member name="M:Server.Controllers.HistoryController.GetHistoryForDeviceToday(System.Int64)">
             <summary>
             Total device Consumption/Production today
             </summary>
         </member>
-        <member name="M:Server.Controllers.HistoryController.GetHistoryForDeviceThisYear(System.Int64)">
-            <summary>
-            Total device Consumption/Production this year
-            </summary>
-        </member>
-        <member name="M:Server.Controllers.HistoryController.GetHistoryForDevicePreviousMonth(System.Int64)">
-            <summary>
-            Total device Consumption/Production this year
-            </summary>
-        </member>
-        <member name="M:Server.Controllers.HistoryFromToController.GetHistoryForCity(System.String,System.String,System.Int64,System.Int64,System.Int64,System.Int64,System.Int64,System.Int64,System.Int64,System.Int64,System.Int64,System.Int64,System.Int64,System.Int64,System.Int64,System.Int64,System.Int64,System.Int64,System.Int64)">
+        <member name="M:Server.Controllers.HistoryFromToController.GetHistoryForCity(System.String,System.String,System.Int64,System.Int64,System.Int64,System.Int64,System.Int64,System.Int64,System.Int64,System.Int64,System.Int64,System.Int64,System.Int64,System.Int64,System.Int64)">
             <summary>
             Histroy - From To
             </summary>
         </member>
-        <member name="M:Server.Controllers.HistoryFromToController.GetHistoryFromDateToDatePagination(System.Int32,System.Int32,System.String,System.String,System.Int64,System.Int64,System.Int64,System.Int64,System.Int64)">
+        <member name="M:Server.Controllers.HistoryFromToController.GetHistoryFromDateToDatePagination(System.Int32,System.Int32,System.String,System.String,System.Int64,System.Int64,System.Int64,System.Int64,System.Int64,System.Int64,System.Int64,System.Int64,System.Int64)">
             <summary>
             Histroy - From To
             </summary>
@@ -272,14 +162,9 @@
             User prediction for next week (by day)
             </summary>
         </member>
-        <member name="M:Server.Controllers.PredictionController.GetCityOrSettlementPredictionForNextWeekByDay(System.Int64,System.Int64,System.Int64,System.Int64,System.Int64,System.Int64,System.Int64)">
+        <member name="M:Server.Controllers.PredictionController.GetCityOrSettlementPredictionForNextWeekByDay(System.Int64,System.Int64,System.Int64)">
             <summary>
             City|Settlement prediction for next/previous week (by day)
-            </summary>
-        </member>
-        <member name="M:Server.Controllers.ProsumerController.GetTotalConsumptionInTheMomentForCategory(System.Int64)">
-            <summary>
-            Total Consumption/Production in The Moment (country)
             </summary>
         </member>
         <member name="M:Server.Controllers.ProsumerController.GetTotalConsumptionInTheMomentForCategoryInSettlement(System.Int64,System.Int64)">
@@ -297,34 +182,9 @@
             Total Consumption/Production in The Moment (one prosumer)
             </summary>
         </member>
-        <member name="M:Server.Controllers.ProsumerController.GetAvgConsumptionInTheMomentForSettlement(System.Int64,System.Int64)">
-            <summary>
-            Average Consumption/Production in The Moment (settlement)
-            </summary>
-        </member>
         <member name="M:Server.Controllers.ProsumerController.GetAvgConsumptionInTheMomentForCity(System.Int64,System.Int64)">
             <summary>
             Average Consumption/Production in The Moment (city)
-            </summary>
-        </member>
-        <member name="M:Server.Controllers.ProsumerController.GetAvgConsumptionInTheMomentForCountry(System.Int64)">
-            <summary>
-            Average Consumption/Production in The Moment (country)
-            </summary>
-        </member>
-        <member name="M:Server.Controllers.ProsumerController.GetTotalNumberOfDevicesInTheCityOrSettlement(System.String,System.Int64,System.Int64,System.Int64)">
-            <summary>
-            Total number of consumption/production devices from all prosumers in the city or settlement
-            </summary>
-        </member>
-        <member name="M:Server.Controllers.ProsumerController.GetDeviceEnergyFromTodaysDay(System.Int64,System.Int64,System.Int64,System.Int64)">
-            <summary>
-            1.) Today`s Consumption/Production for device (by hour) || 2.) Today`s Consumption/Production for one prosumer (double)
-            </summary>
-        </member>
-        <member name="M:Server.Controllers.ProsumerController.GetProsumerEnergyFromThisMonth(System.Int64,System.Int64)">
-            <summary>
-            1.) This month Consumption/Production for one prosumer (double)
             </summary>
         </member>
         <member name="M:Server.Controllers.ProsumerController.GetNumberOfDevicesOfOneProsumer(System.Int64)">

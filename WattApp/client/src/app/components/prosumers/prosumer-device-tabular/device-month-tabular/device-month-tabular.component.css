@@ -7,7 +7,6 @@
     border-radius: 4px;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
     flex-basis: 48%;
-    padding: 20px;
 }
 
 .table-title {
@@ -19,7 +18,7 @@
 
 .table {
     border-collapse: collapse;
-    font-size: 11px;
+    font-size: 15px;
     width: 100%;
 }
 
@@ -27,14 +26,28 @@
 .table td {
     border: 1px solid #dee2e6;
     padding: 8px;
-    text-align: center;
+    text-align: right;
 }
 
 .table th {
-    background-color: #2199e8;
+    background-color: #1c315e;
     color: #fff;
     font-weight: bold;
     text-transform: uppercase;
+}
+
+.container2 {
+    display: inline-block;
+    width: 100%;
+}
+
+mat-form-field {
+    width: 45%;
+    float: left;
+}
+
+.container3 {
+    float: right;
 }
 
 .btn {
@@ -42,14 +55,32 @@
     border: none;
     border-radius: 4px;
     font-size: 16px;
-    margin-left: 5px;
     cursor: pointer;
-    background-color: #1c315e;
-    color: white;
+    background-color: #bce9e4;
+    color: grey;
     font-weight: normal;
     text-align: center;
 }
 
 .btn:hover {
-    background-color: #0d8beb;
+    background-color: #93ede2;
+}
+
+@media(min-width:768px) {
+    .table {
+        font-size: 20px;
+    }
+    mat-form-field {
+        width: 29%;
+        float: none;
+        margin-left: 23%;
+    }
+}
+
+@media(min-width:1280px) {
+    mat-form-field {
+        width: 20%;
+        float: none;
+        margin-left: 36%;
+    }
 }

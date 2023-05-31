@@ -45,12 +45,12 @@ export const MY_FORMATS = {
 export class TabelarViewByMonthComponent implements OnInit{
 
   currentDate = new Date();
-  maxYear = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth()-1, 1);
   list1:WeekByDay[]=[];
   list2:WeekByDay[]=[];
   settlements:Settlement[] = [];
   mergedList: { day: number, month: string, year: number, consumption: number, production: number }[] = [];
   datePipe: any;
+  dateTime: any[] = [];
   constructor(private deviceService:HistoryPredictionService,private authService:AuthService){
     this.date.valueChanges.subscribe((selectedDate : any) => {
       const arr1: any[] = [];
@@ -65,7 +65,7 @@ export class TabelarViewByMonthComponent implements OnInit{
     start: new FormControl(),
     end: new FormControl()
   });
-  selectedDate : Date | undefined;
+  selectedDate : Date = new Date();
   selectedOption: number = 0;
 
   date = new FormControl(moment());
@@ -100,16 +100,7 @@ export class TabelarViewByMonthComponent implements OnInit{
             }
           }
         })
-        if(this.selectedOption == 0 && this.selectedDate === undefined){
-          forkJoin([
-            this.deviceService.monthByDay(number, 2),
-            this.deviceService.monthByDay(number, 1)
-          ]).subscribe(([data1, data2]) => {
-            this.list1 = data1;
-            this.list2 = data2;
-          });
-        }
-        else if(this.selectedOption == 0 && this.selectedDate != undefined){
+        if(this.selectedOption == 0 && this.selectedDate != undefined){
           let month = this.selectedDate!.getMonth()+1;
           let monthString = String(month).padStart(2, '0');
           let year = this.selectedDate!.getFullYear();
@@ -117,13 +108,19 @@ export class TabelarViewByMonthComponent implements OnInit{
           monthString = String(month+1).padStart(2, '0');
           let string2 = year+'-'+monthString+'-0'+1+' '+'00:00:00';
           if(month == 12){
-            string2 = (year+1)+'-0'+1+'-0'+1
+            string2 = (year+1)+'-0'+1+'-0'+1+' '+'00:00:00'
           }
           forkJoin([
             this.deviceService.weekByDayCityFilter(string1,string2,number, 2),
             this.deviceService.weekByDayCityFilter(string1,string2,number, 1)
           ]).subscribe(([list1, list2]) => {
             this.list1 = list1;
+            this.dateTime = [];
+            for (let i = 0; i < this.list1.length; i++) {
+              const pad = (num: number): string => (num < 10 ? '0' + num : String(num));
+              const formattedDay = `${pad(this.list1[i].day)}`;
+              this.dateTime.push(formattedDay)
+            }
             this.list2 = list2;
           });
         }
@@ -135,24 +132,21 @@ export class TabelarViewByMonthComponent implements OnInit{
           monthString = String(month+1).padStart(2, '0');
           let string2 = year+'-'+monthString+'-0'+1+' '+'00:00:00';
           if(month == 12){
-            string2 = (year+1)+'-0'+1+'-0'+1
+            string2 = (year+1)+'-0'+1+'-0'+1+' '+'00:00:00'
           }
 
           forkJoin([
-            this.deviceService.weekByDaySettlementFilter(string1,string2, this.selectedOption,2),
-            this.deviceService.weekByDaySettlementFilter(string1,string2, this.selectedOption,1)
+            this.deviceService.weekByDaySettlementFilter(string1,string2,this.selectedOption,2),
+            this.deviceService.weekByDaySettlementFilter(string1,string2,this.selectedOption,1)
           ]).subscribe(([list1, list2]) => {
             this.list1 = list1;
+            this.dateTime = [];
+            for (let i = 0; i < this.list1.length; i++) {
+              const pad = (num: number): string => (num < 10 ? '0' + num : String(num));
+              const formattedDay = `${pad(this.list1[i].day)}`;
+              this.dateTime.push(formattedDay)
+            }
             this.list2 = list2;
-          });
-        }
-        else{
-          forkJoin([
-            this.deviceService.monthByDaySettlement(this.selectedOption, 2),
-            this.deviceService.monthByDaySettlement(this.selectedOption, 1)
-          ]).subscribe(([data1, data2]) => {
-            this.list1 = data1;
-            this.list2 = data2;
           });
         }
       })
@@ -174,8 +168,6 @@ export class TabelarViewByMonthComponent implements OnInit{
         }
       }
   }
-  const date = new Date();
-  const formattedDate = this.datePipe.transform(date,'dd-MM-yyyy hh:mm:ss');
   const options = {
     fieldSeparator: ',',
     filename: 'consumption/production-month',
@@ -184,7 +176,7 @@ export class TabelarViewByMonthComponent implements OnInit{
     decimalSeparator: '.',
     showLabels: true,
     useTextFile: false,
-    headers: ['Day', 'Month', 'Year', 'Consumption [kWh]', 'Production [kWh]', 'Exported Date '+formattedDate]
+    headers: ['Day', 'Month', 'Year', 'Consumption [kWh]', 'Production [kWh]']
   };
 
   const csvExporter = new ExportToCsv(options);

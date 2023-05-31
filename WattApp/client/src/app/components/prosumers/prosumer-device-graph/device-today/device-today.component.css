@@ -10,7 +10,6 @@
     justify-content: center;
     border-radius: 5px;
     width: 100%;
-    padding-top: 18px;
 }
 
 .chart-container {
@@ -21,18 +20,66 @@
     width: 100%;
 }
 
-mat-form-field {
-    margin-left: 35px;
+.container2 {
+    display: inline-block;
+    width: 100%;
 }
 
-@media only screen and (min-width: 768px) and (max-width: 1280px) {
+mat-form-field {
+    width: 45%;
+    float: left;
+}
+
+.container3 {
+    float: right;
+}
+
+.btn {
+    padding: 8px;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #bce9e4;
+    color: grey;
+    font-weight: normal;
+    text-align: center;
+}
+
+.btn:hover {
+    background-color: #93ede2;
+}
+
+@media only screen and (min-width: 768px) {
     .chart {
         display: inline-block;
     }
-    .chart canvas {
+    .chart-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 40vh;
         width: 100%;
-        /* Set the width to 100% of the parent element */
-        height: 1800px;
-        /* Set the height to 500 pixels */
+    }
+    mat-form-field {
+        width: 29%;
+        float: none;
+        margin-left: 23%;
+    }
+}
+
+@media(min-width:1280px) {
+    mat-form-field {
+        width: 20%;
+        float: none;
+        margin-left: 36%;
+    }
+}
+
+@media(min-width:1660px) {
+    mat-form-field {
+        width: 15%;
+        float: none;
+        margin-left: 39.5%;
     }
 }

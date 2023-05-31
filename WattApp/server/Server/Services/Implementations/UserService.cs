@@ -132,7 +132,7 @@ namespace Server.Services.Implementations
             return page;
         }
 
-        public async Task<DataPage<ProsumerForDSOResponseDTO>> GetPageOfUsersForDSO(int pageNumber, int itemsPerPage, long cityId, long loggedCityId, UserFilterModel userFilterModel, ProsumerDSOFilterModel prosumerDSOFilter)
+        public async Task<DataPage<ProsumerForDSOResponseDTO>> GetPageOfUsersForDSO(int pageNumber, int itemsPerPage, long cityId, long loggedCityId, ProsumerDSOFilterModel filter)
         {
             DataPage<ProsumerForDSOResponseDTO> page = new();
             IQueryable<UserModel> users = null;
@@ -166,45 +166,47 @@ namespace Server.Services.Implementations
                 .Where((user) => user.RoleId == Roles.ProsumerId && user.Settlement.CityId == cityId);
             }
 
-            if (users == null)
-                throw new HttpRequestException("No items found in database.", null, HttpStatusCode.NotFound);
-            users = UserFilter.applyFilters(users, userFilterModel);
-
-            //if (!users.Any()) throw new HttpRequestException("There is no users!", null, System.Net.HttpStatusCode.NotFound);
-
-            IQueryable<ProsumerForDSOResponseDTO> prosumerForDSOResponses = null;
-            List<ProsumerForDSOResponseDTO> listOfProsumers = new List<ProsumerForDSOResponseDTO>();
+            IQueryable<ProsumerForDSOFilterDTO> prosumerForDso = null;
+            List<ProsumerForDSOFilterDTO> listOfProsumers = new List<ProsumerForDSOFilterDTO>();
             foreach(UserModel user in users)
             {
-                listOfProsumers.Add(new ProsumerForDSOResponseDTO(
-                    new UserDetailsDTO(user),
+                listOfProsumers.Add(new ProsumerForDSOFilterDTO(
+                    user,
                     _service.GetTotalConsumptionInTheMomentForOneProsumer(2, user.Id),
                     _service.GetTotalConsumptionInTheMomentForOneProsumer(1, user.Id)));
             }
 
-            prosumerForDSOResponses = listOfProsumers.AsQueryable();
+            prosumerForDso = listOfProsumers.AsQueryable();
 
-            ProsumerDSOFilter.ApplyFilter(prosumerForDSOResponses, prosumerDSOFilter);
-            if (!prosumerForDSOResponses.Any()) throw new HttpRequestException("There is no users!", null, System.Net.HttpStatusCode.NotFound);
-
+            prosumerForDso = ProsumerDSOFilter.ApplyFilter(prosumerForDso, filter);
+            if (prosumerForDso == null)
+            {
+                page.Data = null;
+                page.NextPage = null;
+                page.PreviousPage = null;
+                page.NumberOfPages = 1;
+            }
 
             int maxPageNumber;
-            if (prosumerForDSOResponses.Count() % itemsPerPage == 0) maxPageNumber = prosumerForDSOResponses.Count() / itemsPerPage;
+            if (prosumerForDso.Count() % itemsPerPage == 0) maxPageNumber = prosumerForDso.Count() / itemsPerPage;
             else maxPageNumber = users.Count() / itemsPerPage + 1;
 
-            if (pageNumber < 1 || pageNumber > maxPageNumber) throw new HttpRequestException("Invalid page number!", null, System.Net.HttpStatusCode.BadRequest);
+            if (pageNumber < 1 || pageNumber > maxPageNumber) 
+                throw new HttpRequestException("Invalid page number!", null, System.Net.HttpStatusCode.BadRequest);
             if (itemsPerPage < 1) throw new HttpRequestException("Invalid page size number!", null, System.Net.HttpStatusCode.BadRequest);
 
-            prosumerForDSOResponses = prosumerForDSOResponses.Skip((pageNumber - 1) * itemsPerPage).Take(itemsPerPage);
+            prosumerForDso = prosumerForDso.Skip((pageNumber - 1) * itemsPerPage).Take(itemsPerPage);
 
-            /*List<UserModel> userModels = users.ToList();
-            List<UserDetailsDTO> userDetailsDTOs = new List<UserDetailsDTO>();
-            foreach (UserModel user in userModels)
+            List<ProsumerForDSOResponseDTO> datas = new List<ProsumerForDSOResponseDTO>();
+            foreach (var prosumerForDSO in prosumerForDso)
             {
-                userDetailsDTOs.Add(new UserDetailsDTO(user));
-            }*/
+                datas.Add(new ProsumerForDSOResponseDTO(
+                    new UserDetailsDTO(prosumerForDSO.userModel),
+                    prosumerForDSO.CurrentConsumption,
+                    prosumerForDSO.CurrentProduction));
+            }
 
-            page.Data = prosumerForDSOResponses.ToList();
+            page.Data = datas;
             page.NumberOfPages = maxPageNumber;
             page.PreviousPage = (pageNumber == 1) ? null : pageNumber - 1;
             page.NextPage = (pageNumber == page.NumberOfPages) ? null : pageNumber + 1;
@@ -307,12 +309,18 @@ namespace Server.Services.Implementations
         public object CreatePendingUser(PendingUserModel pendingUser)
         {
             var user = context.Users.Where(src => src.Email == pendingUser.Email).FirstOrDefault();
+            List<ActionFailedDTO> actionFailedDTOs = new List<ActionFailedDTO>();
             if (user != null)
-                return new HttpRequestException("User with that email address already exists.");
+                actionFailedDTOs.Add(new ActionFailedDTO("email", "User with that email address already exists."));
+            user = context.Users.Where(src => src.Username == pendingUser.Username).FirstOrDefault();
+            if (user != null)
+                actionFailedDTOs.Add(new ActionFailedDTO("username", "User with that username already exists."));
+            if (actionFailedDTOs.Count() > 0)
+                return actionFailedDTOs;
             
             var pending = context.PendingUsers.Where(src => src.Email == pendingUser.Email).FirstOrDefault();
             if (pending != null && pending.ExpireAt > DateTime.Now)
-                return new HttpRequestException("Request with that email already exists. Please check your email address.");
+                return new ActionFailedDTO(null, "Request with that email already exists. Please check your email address.");
             else if(pending != null && pending.ExpireAt > DateTime.Now)
                 context.PendingUsers.Remove(pending);
             
@@ -377,24 +385,26 @@ namespace Server.Services.Implementations
         {
             UserModel user = null;
             user = context.Users.Where(src => src.Email == changeEmail.NewEmail).FirstOrDefault();
-            if(user != null)
-            {
-                return new HttpRequestException("User with that email address already exists.");
-            }
-
+            List<ActionFailedDTO> actionFailedDTOs = new List<ActionFailedDTO>();
+            if (user != null)
+                actionFailedDTOs.Add(new ActionFailedDTO("email", "User with that email address already exists."));
+ 
             ChangeEmailModel changeEmailModel = null;
             changeEmailModel = context.ChangeEmailModels.Where(src => src.OldEmail == changeEmail.OldEmail).FirstOrDefault();
             if(changeEmailModel != null)
             {
                 if(changeEmailModel.ExpireAt > DateTime.Now)
                 {
-                    return new HttpRequestException("You've already created request to change email address. Check your email inbox.");
+                    actionFailedDTOs.Add(new ActionFailedDTO("general", "You've already created request to change email address. Check your email inbox."));
                 }
                 else
                 {
                     context.ChangeEmailModels.Remove(changeEmailModel);
                 }
             }
+
+            if (actionFailedDTOs.Count > 0)
+                return actionFailedDTOs;
 
             ChangeEmailModel model = context.ChangeEmailModels.Add(changeEmail).Entity;
             context.SaveChanges();

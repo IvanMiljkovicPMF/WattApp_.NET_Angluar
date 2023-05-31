@@ -1,11 +1,12 @@
 
-import { Component, InjectionToken, OnInit } from '@angular/core';
+import { Component, InjectionToken, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { Categories } from '../../../../utilities/categories'
 import { DevicesService } from 'src/app/services/devices.service';
 import { JwtToken } from 'src/app/utilities/jwt-token';
 import { environment } from 'src/environments/environment';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 let typeID:number=0;
 @Component({
@@ -23,8 +24,6 @@ export class AddDeviceComponent implements OnInit{
     deviceBrandId: 0 ,
     deviceModelId: 0 ,
     name: '' ,
-    energyInKwh: 0,
-    standByKwh: 0,
     visibility: false,
     controlability: false,
     turnOn: false
@@ -34,13 +33,16 @@ export class AddDeviceComponent implements OnInit{
   models:Array<any>=[];
   idProsumer?:number;
 
+  body: string = ''; 
+  btnAction:string='';
+  @ViewChild('modalContent') modalContent!: TemplateRef<any>;
+  AddDevice!: (this: HTMLElement, ev: MouseEvent) => any;
   categories=[
     {id:Categories.ELECTRICITY_PRODUCER_ID,name:Categories.ELECTRICITY_PRODUCER_NAME},
     {id:Categories.ELECTRICITY_CONSUMER_ID,name:Categories.ELECTRICITY_CONSUMER_NAME},
-    {id:Categories.ELECTRICITY_STOCK_ID,name:Categories.ELECTRICITY_STOCK_NAME}
   ]
 
-  constructor(private devicesService:DevicesService,private router:Router,private formBuilder: FormBuilder) {
+  constructor(private devicesService:DevicesService,private router:Router,private formBuilder: FormBuilder,private modalService: NgbModal) {
     this.addDeviceRequest.deviceCategoryId=this.categories[0]?.id
     this.myForm = this.formBuilder.group({
       nameform1: ['', Validators.required],
@@ -62,22 +64,33 @@ export class AddDeviceComponent implements OnInit{
   
   addDevices()
   {
-    
-    
-    this.devicesService.addDevices(this.addDeviceRequest)
-    .subscribe({
-      next:()=>{
-         this.router.navigate(['/devices']);
-      
-      }
-    });
+    this.modalService.open(this.modalContent);
+    const popup= document.getElementById('popup');
+    if(popup!=null)
+    {
+      this.body="Do you want to add this device?"
+        this.btnAction="Add";
+        popup.removeEventListener('click', this.AddDevice);
+        this.AddDevice=()=> {
+        this.devicesService.addDevices(this.addDeviceRequest)
+        .subscribe({
+          next:()=>{
+            this.router.navigate(['/devices']);
+          
+          }
+        });
+        popup.removeEventListener('click',this.AddDevice);
+      };
+      popup.addEventListener('click',this.AddDevice);
+    }
   }
+  
+  
   onSelectedCategory(event:any)
   {
     
     
     this.addDeviceRequest.deviceCategoryId = event.target.value;
-    console.log(this.addDeviceRequest.deviceCategoryId );
     fetch(environment.serverUrl+"/types?categoryId="+this.addDeviceRequest.deviceCategoryId,{headers:{"Authorization":"Bearer "+localStorage.getItem("token")}})
     .then(res=>res.json())
     .then(res=>{
@@ -89,7 +102,6 @@ export class AddDeviceComponent implements OnInit{
   {
     this.addDeviceRequest.deviceTypeId = event.target.value;
     typeID=this.addDeviceRequest.deviceTypeId;
-    console.log(this.addDeviceRequest.deviceTypeId );
     
     
     fetch(environment.serverUrl+"/brands?typeId="+this.addDeviceRequest.deviceTypeId,{headers:{"Authorization":"Bearer "+localStorage.getItem("token")}})
@@ -106,12 +118,10 @@ export class AddDeviceComponent implements OnInit{
   {
     
     this.addDeviceRequest.deviceBrandId = event.target.value;
-    console.log( this.addDeviceRequest.deviceBrandId);
     fetch(environment.serverUrl+"/models?typeId="+typeID+"&brandId="+this.addDeviceRequest.deviceBrandId,{headers:{"Authorization":"Bearer "+localStorage.getItem("token")}})
     .then(res=>res.json())
     .then(res=>{
       this.models=res;
-      console.log(res);
       
     });
   }
@@ -119,6 +129,5 @@ export class AddDeviceComponent implements OnInit{
   onSelectModel(event:any)
   {
     this.addDeviceRequest.deviceModelId = event.target.value;
-    console.log( this.addDeviceRequest.deviceModelId);
   }
 }

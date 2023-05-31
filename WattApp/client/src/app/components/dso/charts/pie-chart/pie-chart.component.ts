@@ -7,6 +7,7 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { AuthService } from 'src/app/services/auth.service';
 import { HistoryPredictionService } from 'src/app/services/history-prediction.service';
 import { Settlement } from 'src/app/models/users.model';
+import { nodeName } from 'jquery';
 Chart.register(ChartDataLabels);
 
 
@@ -18,7 +19,9 @@ Chart.register(ChartDataLabels);
 export class PieChartComponent implements OnInit {
   loader:boolean=false;
   settlements:Settlement[] = [];
+  settlements1:Settlement[] = [];
   settlementsValue:number[] = [];
+  noData:number[]=[];
   constructor(private authService:AuthService,private historyService:HistoryPredictionService) {
   
   }
@@ -28,64 +31,74 @@ export class PieChartComponent implements OnInit {
       this.authService.getCityId(user.city).subscribe(number=>{
         this.authService.getSettlement(number).subscribe((settlement:Settlement[])=>{
           this.settlements = settlement;
-          this.settlements.forEach(settlement =>{
-            this.historyService.getCurrentConsumptionProductionSettlement(1,settlement.id).subscribe(value =>{
+          for (let i = 0; i < this.settlements.length; i++) {
+            this.historyService.getCurrentConsumptionProductionSettlement(1,settlement[i].id).subscribe(value =>{
               this.loader=false;
-              this.settlementsValue.push(value);
-              this.PieChart();
+              if(value!==0)
+              {
+                this.noData.push(1);
+                this.settlementsValue.push(value);
+                this.settlements1.push(settlement[i])
+              } 
+              if(this.noData[0]!=1)
+              { 
+                  this.loader=true;
+              }
+              if(i == this.settlements.length-1){
+                this.PieChart()
+              }
             })
-          })
+            
+          }
         })
       })
     })
+    
   }
 
   PieChart(){
-
-
     const chartId = 'piechart';
     const chartExists = Chart.getChart(chartId);
     if (chartExists) {
         chartExists.destroy();
     }
 
-    const name = this.settlements.map(name => name.name);
+    const name = this.settlements1.map(name => name.name);
     var data= [{
       label: '',
       data: this.settlementsValue,
       backgroundColor: [
         '#7fcdbb',
-          '#c7e9b4',  '#1d91c0', '#225ea8', '#253494', '#081d58','#081d58',
-        // "#2B70A7",
-        // "#BF1E2E",
-        // "#E2B37D",
-        // "#EF4136",
-        // "#F15A2B",
-        // "#006838",
-        // "#B5D4EF",
-        // "#77B3E1",
-        // "#28AAE1",
-        // "#2A3890",
-        // "#F9ED32",
-        // "#D7E022",
-        // "#8DC73F",
-        // "#39B54A",
-        // "#009445",
-        // "#F5F194",
-        // "#F2F5CD",
-        // "#7B5231",
-        // "#68499E",
-        // "#662D91",
-        // "#AF7AC5",
-        // " #2E8B57 ", 
-        // "#87CEFA", 
-        // "#D7E022",
-          ],
+        '#c7e9b4',  
+        '#1d91c0', 
+        '#225ea8', 
+        '#253494', 
+        '#081d58',
+        '#52988f',
+        '#86b59d',
+        '#207b97',
+        '#2d6b8b',
+        '#2f317f',
+        '#0d1848',
+        '#3c6c68',
+        '#aec9c5',
+        '#749cab',
+        '#8b99a8',
+        '#141e70',
+        '#193d36',
+        '#8fc4c1',
+        '#5a908b',
+        '#15667c',
+        '#1e5386',
+        '#1f255e',
+        '#0a0e2d',
+        '#5d8581',
+        '#6f7a91'
+        ],
       borderWidth: 1,
-      borderColor: "#00000",
+      borderColor: "gray",
   },]
-    var ctx = "piechart";
-    var myChart = new Chart(ctx, {
+    const myChart = new Chart("piechart", {
       
       type: 'doughnut',
       data: {
@@ -93,6 +106,18 @@ export class PieChartComponent implements OnInit {
           datasets: data
       },
       options: {
+        onHover: (e, chartEle) => {
+          if (e.native) {
+            const target = e.native.target as HTMLElement;
+            if (target instanceof HTMLElement) {
+              target.style.cursor = chartEle.length > 0 && chartEle[0] ? 'pointer' : 'default';
+            } else {
+              console.error('Invalid target element:', target);
+            }
+          } else {
+            console.error('Missing native event:', e);
+          }
+        },  
         maintainAspectRatio:false,
         responsive:true,
         plugins: {
@@ -114,7 +139,7 @@ export class PieChartComponent implements OnInit {
             },
             legend: {
               labels:{
-                color:'#000',
+                color:'gray',
                 font:{
                   size:15
                 }
@@ -128,7 +153,6 @@ export class PieChartComponent implements OnInit {
               onLeave: function (event, legendItem, legend) {
                   document.body.style.cursor = 'default';
               },
-              
               
             },
            

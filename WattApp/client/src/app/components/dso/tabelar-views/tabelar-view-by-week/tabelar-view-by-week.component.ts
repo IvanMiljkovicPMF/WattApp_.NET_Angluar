@@ -55,18 +55,22 @@ export class TabelarViewByWeekComponent implements OnInit {
 
   currentDate = new Date();
   maxDate = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(),this.currentDate.getDate()-7);
+  firstdate = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(),this.currentDate.getDate()-7);
   list1:WeekByDay[] = [];
   list2:WeekByDay[] = [];
   settlements:Settlement[] = [];
   mergedList: { day: number, month: string, year: number, consumption: number, production: number }[] = [];
   datePipe: any;
+  dateTime: any[] = [];
 
   constructor(private deviceService:HistoryPredictionService,private authService:AuthService) {
     this.campaignOne.valueChanges.subscribe((value) => {
       this.sdate = value.start;
-      this.send = value.end;
-      if(this.send > this.maxDate){
-        this.send = null;
+      if(value.end == null){
+        this.send = this.currentDate;
+      }
+      else{
+        this.send = value.end
       }
       this.ngOnInit();
     });
@@ -79,8 +83,8 @@ export class TabelarViewByWeekComponent implements OnInit {
     end: new FormControl()
   });
 
-  sdate = this.campaignOne.value.start;
-  send = this.campaignOne.value.end;
+  sdate = this.firstdate;
+  send = this.currentDate;
 
   onOptionSelected() {
     this.ngOnInit();
@@ -103,16 +107,7 @@ export class TabelarViewByWeekComponent implements OnInit {
               }
             }
           })
-          if(this.selectedOption == 0 && (this.sdate == null && this.send == null) || (this.sdate != null && this.send == null)){
-            forkJoin([
-              this.deviceService.weekByDay(number, 2),
-              this.deviceService.weekByDay(number, 1)
-            ]).subscribe(([list1, list2]) => {
-              this.list1 = list1;
-              this.list2 = list2;
-            });
-          }
-          else if(this.selectedOption == 0 && this.sdate != null && this.send != null){
+          if(this.selectedOption == 0 && this.sdate != null && this.send != null){
             const day1 = this.sdate.getDate();
             const month1 = this.sdate.getMonth()+1;
             let dayString1 = String(day1).padStart(2, '0');
@@ -131,6 +126,12 @@ export class TabelarViewByWeekComponent implements OnInit {
               this.deviceService.weekByDayCityFilter(string1,string2,number, 1)
             ]).subscribe(([list1, list2]) => {
               this.list1 = list1;
+              this.dateTime = [];
+              for (let i = 0; i < this.list1.length; i++) {
+                const pad = (num: number): string => (num < 10 ? '0' + num : String(num));
+                const formattedDay = `${pad(this.list1[i].day)}`;
+                this.dateTime.push(formattedDay)
+              }
               this.list2 = list2;
             });
           }
@@ -149,19 +150,16 @@ export class TabelarViewByWeekComponent implements OnInit {
             let string2 = year2+'-'+monthString2+'-'+dayString2+' '+'00:00:00';
   
             forkJoin([
-              this.deviceService.weekByDaySettlementFilter(string1,string2,number, this.selectedOption),
-              this.deviceService.weekByDaySettlementFilter(string1,string2,number, this.selectedOption)
+              this.deviceService.weekByDaySettlementFilter(string1,string2,this.selectedOption,2),
+              this.deviceService.weekByDaySettlementFilter(string1,string2,this.selectedOption,1)
             ]).subscribe(([list1, list2]) => {
               this.list1 = list1;
-              this.list2 = list2;
-            });
-          }
-          else{
-            forkJoin([
-              this.deviceService.weekByDaySettlement(this.selectedOption, 2),
-              this.deviceService.weekByDaySettlement(this.selectedOption, 1)
-            ]).subscribe(([list1, list2]) => {
-              this.list1 = list1;
+              this.dateTime = [];
+              for (let i = 0; i < this.list1.length; i++) {
+                const pad = (num: number): string => (num < 10 ? '0' + num : String(num));
+                const formattedDay = `${pad(this.list1[i].day)}`;
+                this.dateTime.push(formattedDay)
+              }
               this.list2 = list2;
             });
           }
@@ -185,8 +183,6 @@ export class TabelarViewByWeekComponent implements OnInit {
         }
       }
   }
-  const date = new Date();
-  const formattedDate = this.datePipe.transform(date,'dd-MM-yyyy hh:mm:ss');
   const options = {
     fieldSeparator: ',',
     filename: 'consumption/production-week',
@@ -195,7 +191,7 @@ export class TabelarViewByWeekComponent implements OnInit {
     decimalSeparator: '.',
     showLabels: true,
     useTextFile: false,
-    headers: ['Day', 'Month', 'Year', 'Consumption [kWh]', 'Production [kWh]', 'Exported Date '+formattedDate]
+    headers: ['Day', 'Month', 'Year', 'Consumption [kWh]', 'Production [kWh]']
   };
 
   const csvExporter = new ExportToCsv(options);

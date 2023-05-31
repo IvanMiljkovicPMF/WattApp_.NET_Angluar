@@ -1,13 +1,11 @@
-import { HttpErrorResponse } from '@angular/common/http';
 import { Component, ElementRef, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import { NavigationEnd, Router } from '@angular/router';
-import { Users } from 'src/app/models/users.model';
+import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
 import { Roles } from 'src/app/utilities/role';
 import { environment } from 'src/environments/environment';
 import { LatLng } from 'leaflet';
-import { Location } from '@angular/common';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { FormBuilder,Validators } from '@angular/forms';
 @Component({
   selector: 'app-admin-dso-add',
   templateUrl: './admin-dso-add.component.html',
@@ -26,24 +24,29 @@ export class AdminDsoAddComponent implements OnInit{
 	latitude:44.01721187973962,
 	longitude:20.90732574462891
   }
-  public emailErrorMessage:string="";
-  public errorMessage:string=""; 
-  public success:boolean=false;
-  public passwordGen='';
-  public emailUp='';
+  userForm=this.fb.group({
+    name:['',Validators.required],
+    email:['',[Validators.required,Validators.email]],
+    username:['',Validators.required],
+    role:[1,Validators.required],
+  })
   public roles=Roles;
 
   public cities:any;
   public settlements:any;
   currentUrl: any;
-  
-  constructor(private usersService:AuthService,private router:Router) { }
+  isFormDirty: boolean = false;
+  isFormDirty2: boolean = false;
+  btnAction:string=''  
+  confirm:boolean=false;
+
+  @ViewChild('modalContent') modalContent!: TemplateRef<any>;
+  body: string = ''; 
+
+  constructor(private usersService:AuthService,private router:Router,private modalService: NgbModal,private fb:FormBuilder) { }
 
   ngOnInit(): void {
-
-
-
-
+    
 	fetch(environment.serverUrl+"/cities?countryId=1",{headers:{"Authorization":"Bearer "+localStorage.getItem("token")}})
 	.then(res=>res.json())
 	.then(res=>{
@@ -71,13 +74,18 @@ export class AdminDsoAddComponent implements OnInit{
   }
   addUsers()
   {
+    this.isFormDirty2=true
     this.usersService.addUsers(this.addUserRequest)
     .subscribe({
       next:()=>{
-         this.router.navigate(['dashboard']);
+        this.modalService.open(this.modalContent);
+        this.body="Email confirmation has been successfully sent to the user's email.";
+        this.router.navigate(['/add-user']);
+        location.reload()
       
       }
     });
+    this.isFormDirty = false;
   }
   locationChanged(latLng:LatLng){
 	this.addUserRequest.latitude=latLng.lat;
@@ -87,5 +95,16 @@ export class AdminDsoAddComponent implements OnInit{
 		this.addUserRequest.address=event.address;
 		this.addUserRequest.settlementId=event.settlement;
 	}
-  
+  onFormChange() {
+
+    if(this.addUserRequest.name==="" && this.addUserRequest.email==="" && this.addUserRequest.username==="" )
+    {
+      this.isFormDirty = false;
+    }
+    else
+    {
+      this.isFormDirty = true;
+    }
+    
+  }
 }

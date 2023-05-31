@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
-import { Prosumers } from 'src/app/models/users.model';
 import { AuthService } from 'src/app/services/auth.service';
 import { HistoryPredictionService } from 'src/app/services/history-prediction.service';
+import { SessionService } from 'src/app/services/session.service';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -17,18 +16,24 @@ export class AllProsumersComponent implements OnInit {
   totalItems = 20;
   data: any[] = [];
   prosumerValues: any[] = [];
-i: any;
+  loader:boolean=false;
+  showFilters:boolean = !environment.production;
+  filters : ProsumerFilterModel = new ProsumerFilterModel(
+	0,
+	1,
+	0,
+	0,
+	""
+  );
 
-  constructor(
-    private authService: AuthService,
-    private historyService: HistoryPredictionService
-  ) {}
+  constructor(private service : AuthService) {}
 
   ngOnInit(): void {
     this.pageChanged(1);
   }
 
   pageChanged(pageNumber:number){
+	this.loader=true;
 	let url=new URL(this.url);
 		url.searchParams.set("pageNumber",pageNumber.toString());
 		url.searchParams.set("pageSize",this.itemsPerPage.toString());
@@ -39,19 +44,45 @@ i: any;
 		},3000);
 		fetch(url.toString(),{headers:{"Authorization":"Bearer "+localStorage.getItem("token")},signal:controller.signal})
 		.then(res=>{
+			this.loader=false;
 			if(res.status==401 || res.status==403){
 				return Promise.reject("aaa");
 			}
 			return res.json();
 		})
 		.then(res=>{
+			this.loader=false;
 				if(res==undefined)
 					return;
 				this.data=res?.data;
 				this.currentPage=pageNumber;
 				this.totalItems=res.numberOfPages*this.itemsPerPage;
-        		this.prosumerValues = res;	
+        		this.prosumerValues = res;
+
 		})
-    
   }
+
+}
+
+export class ProsumerFilterModel{
+	settlementId : number;
+
+	categoryId : number;
+	greaterThan : number;
+	value : number;
+
+	searchValue : string;
+
+	constructor(settlementId : number,
+				categoryId : number,
+				greaterThan : number,
+				value : number,
+				searchValue : string)
+	{
+		this.settlementId = settlementId;
+		this.categoryId = categoryId;
+		this.greaterThan = greaterThan;
+		this.value = value;
+		this.searchValue = searchValue;
+	}
 }

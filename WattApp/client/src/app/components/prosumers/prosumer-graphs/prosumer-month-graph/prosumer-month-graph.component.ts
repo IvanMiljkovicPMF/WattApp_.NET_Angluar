@@ -1,10 +1,9 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component } from '@angular/core';
 import { Chart,registerables } from 'node_modules/chart.js'
-import { forkJoin, switchMap } from 'rxjs';
+import { forkJoin } from 'rxjs';
 import { WeekByDay } from 'src/app/models/devices.model';
 import { HistoryPredictionService } from 'src/app/services/history-prediction.service';
-import { MatDatepickerModule} from '@angular/material/datepicker';
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormControl } from '@angular/forms';
 import {MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS} from '@angular/material-moment-adapter';
 import {DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE} from '@angular/material/core';
 import {MatDatepicker} from '@angular/material/datepicker';
@@ -14,6 +13,7 @@ import * as _moment from 'moment';
 import {default as _rollupMoment, Moment} from 'moment';
 import { ActivatedRoute } from '@angular/router';
 import { JwtToken } from 'src/app/utilities/jwt-token';
+import { ExportToCsv } from 'export-to-csv';
 
 const moment = _rollupMoment || _moment;
 
@@ -45,11 +45,9 @@ export const MY_FORMATS = {
 export class ProsumerMonthGraphComponent {
 
   currentDate = new Date();
-  maxYear = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth()-1, 1);
   list1:WeekByDay[]=[];
-  list2:WeekByDay[]=[];
-  itemList: string[] = ['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19'
-  ,'20','21','22','23','24','25','26','27','28','29','30'];
+  list1pred: number[] = [];
+  mergedList: { day: number, month: string, year: number, consumption: number, production: number }[] = [];
   constructor(private deviceService:HistoryPredictionService,private route:ActivatedRoute) {
     this.date.valueChanges.subscribe((selectedDate : any) => {
       const arr1: any[] = [];
@@ -58,7 +56,7 @@ export class ProsumerMonthGraphComponent {
     this.ngOnInit();
     });
   }
-  selectedDate : Date | undefined;
+  selectedDate : Date = new Date();
   date = new FormControl(moment());
 
   setMonthAndYear(normalizedMonthAndYear: Moment, datepicker: MatDatepicker<Moment>) {
@@ -73,15 +71,6 @@ export class ProsumerMonthGraphComponent {
   ngOnInit(): void {
     let token=new JwtToken();
     const userId = token.data.id as number;
-    if(this.selectedDate == undefined){
-      forkJoin({
-        list1: this.deviceService.monthByDayUser(userId, 2),
-      }).subscribe(({ list1 }) => {
-        this.list1 = list1;
-        this.BarPlotConsumption();
-      });
-    }
-    else{
           let month = this.selectedDate!.getMonth()+1;
           let monthString = String(month).padStart(2, '0');
           let year = this.selectedDate!.getFullYear();
@@ -95,9 +84,14 @@ export class ProsumerMonthGraphComponent {
             this.deviceService.weekByDayUserFilter(string1,string2,userId, 2),
           ]).subscribe(([list1]) => {
             this.list1 = list1;
+            this.list1pred = [];
+            for (const obj of this.list1) {
+              const increasedEnergy = obj.energyUsageResult * (1 + Math.random() * (0.20) - 0.01); // Increase energy property by random percentage
+              const roundedEnergy = increasedEnergy.toFixed(2);
+              this.list1pred.push(Number(roundedEnergy));
+            }
             this.BarPlotConsumption();
           });
-    }
   }
 
   BarPlotConsumption(){
@@ -110,7 +104,11 @@ export class ProsumerMonthGraphComponent {
 
     const energyUsageResults1 = this.list1.map(day => day.energyUsageResult);
     const monthbyday = this.list1.map(day => day.day);
-
+    let max=0;
+    if(energyUsageResults1[0]===0 )
+    {
+      max=1;
+    }
     const Linechart =new Chart("barplot2", {
         type: 'bar',
        
@@ -119,10 +117,19 @@ export class ProsumerMonthGraphComponent {
           
           datasets: [
             {
-              label: 'Consumption',
+              label: ' Consumption',
               data: energyUsageResults1,
-              borderColor: '#7fcdbb',
-              backgroundColor: '#7fcdbb',
+              borderColor:  'rgba(127, 205, 187, 1)',
+              backgroundColor:  'rgba(127, 205, 187, 0.3)',
+              borderWidth: 2.5,
+            },
+            {
+              label: ' Prediction',
+              data: this.list1pred,
+              borderColor: 'rgba(252, 129, 155, 1)',
+              backgroundColor: 'rgba(252, 129, 155, 0.2)',
+              borderWidth: 2,
+              categoryPercentage:0.5
               
             },
             
@@ -131,22 +138,35 @@ export class ProsumerMonthGraphComponent {
         },
         options: 
         {
+          onHover: (e, chartEle) => {
+            if (e.native) {
+              const target = e.native.target as HTMLElement;
+              if (target instanceof HTMLElement) {
+                target.style.cursor = chartEle.length > 0 && chartEle[0] ? 'pointer' : 'default';
+              } else {
+                console.error('Invalid target element:', target);
+              }
+            } else {
+              console.error('Missing native event:', e);
+            }
+          },  
           maintainAspectRatio: false,
-          responsive: true, // Enable responsiveness
+          responsive: true, 
           
           scales:{
             y: {
               ticks:{
-                color:'#000',
+                color:'gray',
                 font:{
                   size:13
                 }
               },
+              suggestedMax:max,
               position: "left",
               title:{
                 display:true,
-                text: "Consumption (kWh)",
-                color: '#000',
+                text: "Consumption [kWh]",
+                color: 'gray',
                 font:{
                   size:13
                 }
@@ -154,8 +174,9 @@ export class ProsumerMonthGraphComponent {
             }
             ,
             x:{
+              stacked:true,
               ticks:{
-                color:'#000',
+                color:'gray',
                 font:{
                   size:13
                 }
@@ -164,26 +185,46 @@ export class ProsumerMonthGraphComponent {
               title:{
                 display:true,
                 text: "Days in a month",
-                color: '#000',
+                color: 'gray',
                 font:{
                   size:13
                 }
               }
             }
           },
-         
+          interaction: {
+            intersect: false,
+            mode: 'index',
+          },
           plugins: {
             datalabels: {
               display: false
             },
-            legend:{
-              display:false
+            legend: {
+              labels:{
+              color:'gray',
+             
+              font:{
+                size:16
+              },
+              boxWidth:15,
+              boxHeight:15,
+              useBorderRadius:true,
+              borderRadius:7
             },
-          
+              
+              position: 'bottom',
+              onHover: function (event, legendItem, legend) {
+                document.body.style.cursor = 'pointer';
+              },
+              onLeave: function (event, legendItem, legend) {
+                  document.body.style.cursor = 'default';
+              },
+            },
             title: {
               display: true,
               text: 'Consumption in a month',
-              color: '#000',
+              color: 'gray',
               font:{
                 size:15
               }
@@ -191,5 +232,22 @@ export class ProsumerMonthGraphComponent {
           }
         }
       });
+  }
+
+  downloadCSV(): void {
+  const options = {
+    fieldSeparator: ',',
+    filename: 'consumption-month',
+    quoteStrings: '"',
+    useBom : true,
+    decimalSeparator: '.',
+    showLabels: true,
+    useTextFile: false,
+    headers: ['Day', 'Month', 'Year', 'Consumption [kWh]']
+  };
+
+  const csvExporter = new ExportToCsv(options);
+  const csvData = csvExporter.generateCsv(this.list1);
+
   }
 }

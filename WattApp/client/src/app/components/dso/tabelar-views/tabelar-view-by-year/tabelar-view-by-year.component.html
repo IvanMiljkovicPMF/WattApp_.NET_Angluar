@@ -1,12 +1,19 @@
 <div class="container">
   <div class="row">
     <div class="col-md-12">
-      <h1>Energy Usage</h1>
-      <div class="form-group">
+      <div class="container1">
+        <div class="form-group">
+          <label for="dropdown ">Select by settlement</label>
+          <select class="form-select" aria-label="Default select example" id="dropdown"  [(ngModel)]="selectedOption" (change)="onOptionSelected()">
+            <option value="0">Total</option>
+            <option *ngFor="let item of settlements" value="{{item.id}}">{{item.name}}</option>
+          </select>
+        </div>
+      </div>
+      <div class="container2">
         <mat-form-field appearance="fill">
           <mat-label>Year</mat-label>
           <input matInput [matDatepicker]="dp" [formControl]="date" [max]="maxYear">
-          <mat-hint>YYYY</mat-hint>
           <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
           <mat-datepicker #dp
                           startView="multi-year"
@@ -17,11 +24,9 @@
             <mat-month-view></mat-month-view>
           </mat-datepicker>
         </mat-form-field>
-        <label>Select Settlement:</label>
-        <select style="padding: 10px; text-align: center;" id="dropdown"  [(ngModel)]="selectedOption" (change)="onOptionSelected()">
-          <option value="0">Total</option>
-          <option *ngFor="let item of settlements" value="{{item.id}}">{{item.name}}</option>
-        </select>
+      </div>
+      
+      <div class="container3">
         <button class="btn" (click)="downloadCSV()">Export to CSV</button>
       </div>
       <div class="table-container">
@@ -30,10 +35,9 @@
           <table class="table">
             <thead>
               <tr>
-                <th>Year</th>
-                <th>Month</th>
-                <th>Consumption</th>
-                <th>Production</th>
+                <th>Date time</th>
+                <th>Consumption in [kWh]</th>
+                <th>Production in [kWh]</th>
 
               </tr>
             </thead>
@@ -41,10 +45,9 @@
               <tr *ngFor="let item1 of list1">
                 <ng-container *ngFor="let item2 of list2">
                   <ng-container *ngIf="item1.year == item2.year && item1.month == item2.month">
-                    <td>{{ item1.year }}</td>
-                    <td>{{ item1.month }}</td>
-                    <td>{{ item1.energyUsageResult }} kWh</td>
-                    <td>{{ item2.energyUsageResult }} kWh</td>
+                    <td>{{ item1.year }}/{{ item1.month }}</td>
+                    <td>{{ item1.energyUsageResult }}</td>
+                    <td>{{ item2.energyUsageResult }}</td>
                   </ng-container>
                 </ng-container>
               </tr>

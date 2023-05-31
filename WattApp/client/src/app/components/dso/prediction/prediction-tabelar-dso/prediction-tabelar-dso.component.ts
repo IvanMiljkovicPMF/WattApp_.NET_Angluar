@@ -18,6 +18,7 @@ export class PredictionTabelarDsoComponent {
   settlements:Settlement[] = [];
   mergedList: { day: number, month: string, year: number, consumption: number, production: number }[] = [];
   datePipe: any;
+  dateTime: any[] = [];
   constructor(private authService:AuthService,private deviceService:HistoryPredictionService){}
 
   selectedOption: number = 0;
@@ -47,20 +48,32 @@ export class PredictionTabelarDsoComponent {
         
         if(this.selectedOption == 0){
           forkJoin([
-            this.deviceService.weekByDay(number, 2),
-            this.deviceService.weekByDay(number, 1)
+            this.deviceService.predictionCity(number, 2),
+            this.deviceService.predictionCity(number, 1)
           ]).subscribe(([list1, list2]) => {
             this.list1 = list1;
+            this.dateTime = [];
+              for (let i = 0; i < this.list1.length; i++) {
+                const pad = (num: number): string => (num < 10 ? '0' + num : String(num));
+                const formattedDay = `${pad(this.list1[i].day)}`;
+                this.dateTime.push(formattedDay)
+              }
             this.list2 = list2;
           });
           
         }
         else{
           forkJoin([
-            this.deviceService.weekByDaySettlement(this.selectedOption, 2),
-            this.deviceService.weekByDaySettlement(this.selectedOption, 1)
+            this.deviceService.predictionSettlement(this.selectedOption, 2),
+            this.deviceService.predictionSettlement(this.selectedOption, 1)
           ]).subscribe(([list1, list2]) => {
             this.list1 = list1;
+            this.dateTime = [];
+              for (let i = 0; i < this.list1.length; i++) {
+                const pad = (num: number): string => (num < 10 ? '0' + num : String(num));
+                const formattedDay = `${pad(this.list1[i].day)}`;
+                this.dateTime.push(formattedDay)
+              }
             this.list2 = list2;
           });
         }
@@ -83,8 +96,6 @@ export class PredictionTabelarDsoComponent {
         }
       }
   }
-  const date = new Date();
-  const formattedDate = this.datePipe.transform(date,'dd-MM-yyyy hh:mm:ss');
   const options = {
     fieldSeparator: ',',
     filename: 'prediction-week',
@@ -93,7 +104,7 @@ export class PredictionTabelarDsoComponent {
     decimalSeparator: '.',
     showLabels: true,
     useTextFile: false,
-    headers: ['Day', 'Month', 'Year', 'Consumption', 'Production', 'Exported Date '+formattedDate]
+    headers: ['Day', 'Month', 'Year', 'Consumption [kWh]', 'Production [kWh]']
   };
 
   const csvExporter = new ExportToCsv(options);

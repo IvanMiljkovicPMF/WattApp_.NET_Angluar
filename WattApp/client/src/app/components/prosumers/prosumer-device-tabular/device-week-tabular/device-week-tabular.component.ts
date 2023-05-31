@@ -56,15 +56,19 @@ export class DeviceWeekTabularComponent {
   productionGraph:boolean = false;
   currentDate = new Date();
   maxDate = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(),this.currentDate.getDate()-7);
+  firstdate = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(),this.currentDate.getDate()-7);
   list1:WeekByDay[] = [];
   list2:WeekByDay[] = [];
+  dateTime: any[] = [];
   datePipe: any;
   constructor(private deviceService:HistoryPredictionService,private route:ActivatedRoute,private authService:AuthService) {
     this.campaignOne.valueChanges.subscribe((value) => {
       this.sdate = value.start;
-      this.send = value.end;
-      if(this.send > this.maxDate){
-        this.send = null;
+      if(value.end == null){
+        this.send = this.currentDate;
+      }
+      else{
+        this.send = value.end
       }
       this.ngOnInit();
     });
@@ -74,8 +78,8 @@ export class DeviceWeekTabularComponent {
     end: new FormControl()
   });
 
-  sdate = this.campaignOne.value.start;
-  send = this.campaignOne.value.end;
+  sdate = this.firstdate;
+  send = this.currentDate;
 
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
@@ -118,11 +122,23 @@ export class DeviceWeekTabularComponent {
           ]).subscribe(([list1, list2]) => {
             if(data.deviceCategory == "Electricity Consumer"){
               this.list1 = list1;
+              this.dateTime = [];
+              for (let i = 0; i < this.list1.length; i++) {
+                const pad = (num: number): string => (num < 10 ? '0' + num : String(num));
+                const formattedDay = `${pad(this.list1[i].day)}`;
+                this.dateTime.push(formattedDay)
+              }
               this.consumptionGraph = true;
 
             }
             else{
               this.list2 = list2;
+              this.dateTime = [];
+              for (let i = 0; i < this.list2.length; i++) {
+                const pad = (num: number): string => (num < 10 ? '0' + num : String(num));
+                const formattedDay = `${pad(this.list2[i].day)}`;
+                this.dateTime.push(formattedDay)
+              }
               this.productionGraph = true;
             }
           });
@@ -131,8 +147,6 @@ export class DeviceWeekTabularComponent {
   }
   downloadCSV(): void {
     const deviceId = Number(this.route.snapshot.paramMap.get('id'));
-    const date = new Date();
-    const formattedDate = this.datePipe.transform(date,'dd-MM-yyyy hh:mm:ss');
     this.authService.getDevice(deviceId).subscribe(data=>{
       if(data.deviceCategory == "Electricity Consumer"){
           const options = {
@@ -143,12 +157,12 @@ export class DeviceWeekTabularComponent {
           decimalSeparator: '.',
           showLabels: true,
           useTextFile: false,
-          headers: ['Hour', 'Day', 'Month', 'Year', 'Consumption [kWh]', 'Exported Date '+formattedDate]
+          headers: ['Hour', 'Day', 'Month', 'Year', 'Consumption [kWh]']
         };
         const csvExporter = new ExportToCsv(options);
         const csvData = csvExporter.generateCsv(this.list1);
       }
-      else{
+      else if(data.deviceCategory == "Electricity Producer"){
           const options = {
           fieldSeparator: ',',
           filename: 'production-week',
@@ -157,7 +171,7 @@ export class DeviceWeekTabularComponent {
           decimalSeparator: '.',
           showLabels: true,
           useTextFile: false,
-          headers: ['Hour', 'Month', 'Year', 'Production [kWh]', 'Exported Date '+formattedDate]
+          headers: ['Hour', 'Month', 'Year', 'Production [kWh]']
         };
         const csvExporter = new ExportToCsv(options);
         const csvData = csvExporter.generateCsv(this.list2);

@@ -14,15 +14,16 @@ import { JwtToken } from 'src/app/utilities/jwt-token';
 export class ProsumerDayTableComponent {
 
   maxDate: Date;
+  currentDate = new Date();
   list1:DayByHour[] = [];
   list2:DayByHour[] = [];
+  dateTime:{day:string,hour:string}[] = [];
   mergedList: { hour: number, day: number, month: string, year: number, consumption: number, production: number }[] = [];
-  datePipe: any;
   constructor(private route:ActivatedRoute,private deviceService:HistoryPredictionService) {
     this.maxDate = new Date();
   }
   
-  selectedDate!: Date;
+  selectedDate: Date = new Date();
 
   onDateSelected(event: { value: Date; }) {
     this.selectedDate = event.value;
@@ -32,17 +33,6 @@ export class ProsumerDayTableComponent {
   ngOnInit(): void {
     let token=new JwtToken();
     const userId = token.data.id as number;
-  
-    if(this.selectedDate == undefined){
-      combineLatest([
-        this.deviceService.dayByHourUser(userId, 2),
-        this.deviceService.dayByHourUser(userId, 1)
-      ]).subscribe(([list1, list2]) => {
-        this.list1 = list1;
-        this.list2 = list2;
-      });
-    }
-    else if(this.selectedDate !== undefined){
       const day = this.selectedDate.getDate();
       let dayString = String(day).padStart(2, '0');
       const month = this.selectedDate.getMonth()+1;
@@ -82,12 +72,21 @@ export class ProsumerDayTableComponent {
       forkJoin([
         this.deviceService.dayByHourUserFilter(string1,string2,userId, 2),
         this.deviceService.dayByHourUserFilter(string1,string2,userId, 1)
-      ]).subscribe(([list1, list2]) => {
+      ]).subscribe(([list1,list2]) => {
         this.list1 = list1;
+        this.dateTime = [];
+        for (let i = 0; i < this.list1.length; i++) {
+          const pad = (num: number): string => (num < 10 ? '0' + num : String(num));
+          const formattedHour = `${pad(this.list1[i].hour)}:00:00`;
+          const formattedDay = `${pad(this.list1[i].day)}`;
+          this.dateTime.push({
+            hour : formattedHour,
+            day : formattedDay
+          })
+        }
         this.list2 = list2;
       });
     }
-  }
   downloadCSV(): void {
       this.mergedList = [];
       for (let i = 0; i < this.list1.length; i++) {
@@ -105,17 +104,15 @@ export class ProsumerDayTableComponent {
           }
         }
     }
-    const date = new Date();
-    const formattedDate = this.datePipe.transform(date,'dd-MM-yyyy hh:mm:ss');
     const options = {
       fieldSeparator: ',',
-      filename: 'consumption/production-day.csv',
+      filename: 'consumption/production-day',
       quoteStrings: '"',
       useBom : true,
       decimalSeparator: '.',
       showLabels: true,
       useTextFile: false,
-      headers: ['Hour', 'Day', 'Month', 'Year', 'Consumption [kWh]', 'Production [kWh]', 'Exported Date '+formattedDate]
+      headers: ['Hour', 'Day', 'Month', 'Year', 'Consumption [kWh]', 'Production [kWh]']
     };
 
     const csvExporter = new ExportToCsv(options);

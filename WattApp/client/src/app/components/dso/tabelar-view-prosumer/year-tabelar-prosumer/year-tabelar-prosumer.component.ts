@@ -38,8 +38,7 @@ export const MY_FORMATS = {
 })
 export class YearTabelarProsumerComponent {
 
-  currentDate = new Date();
-  maxYear = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth()-1, 1);
+  maxYear = new Date();
   list1:YearsByMonth[]=[];
   list2:YearsByMonth[]=[];
   mergedList: {month: string, year: number, consumption: number, production: number }[] = [];
@@ -54,7 +53,7 @@ export class YearTabelarProsumerComponent {
   }
 
   date = new FormControl(moment());
-  selectedDate : Date | undefined;
+  selectedDate : Date = new Date();
   setYear(year: Moment, datepicker: MatDatepicker<Moment>) {
     const ctrlValue = this.date.value!;
     ctrlValue.year(year.year());
@@ -100,8 +99,6 @@ export class YearTabelarProsumerComponent {
         }
       }
   }
-  const date = new Date();
-  const formattedDate = this.datePipe.transform(date,'dd-MM-yyyy hh:mm:ss');
   const options = {
     fieldSeparator: ',',
     filename: 'consumption/production-year',
@@ -110,7 +107,7 @@ export class YearTabelarProsumerComponent {
     decimalSeparator: '.',
     showLabels: true,
     useTextFile: false,
-    headers: ['Month', 'Year', 'Consumption [kWh]', 'Production [kWh]', 'Exported Date '+formattedDate]
+    headers: ['Month', 'Year', 'Consumption [kWh]', 'Production [kWh]']
   };
 
   const csvExporter = new ExportToCsv(options);

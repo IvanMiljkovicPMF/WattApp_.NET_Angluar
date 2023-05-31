@@ -20,6 +20,7 @@ export class PredictionTabularDeviceComponent {
   list2:WeekByDay[] = [];
   mergedList: { day: number, month: string, year: number, consumption: number, production: number }[] = [];
   datePipe: any;
+  dateTime: any[] = [];
 
   constructor(private deviceService:HistoryPredictionService,private route:ActivatedRoute,private authService:AuthService) {
     
@@ -32,6 +33,12 @@ export class PredictionTabularDeviceComponent {
       {
         this.deviceService.predictionDevice(id).subscribe(consumption =>{
           this.list1 = consumption;
+          this.dateTime = [];
+              for (let i = 0; i < this.list1.length; i++) {
+                const pad = (num: number): string => (num < 10 ? '0' + num : String(num));
+                const formattedDay = `${pad(this.list1[i].day)}`;
+                this.dateTime.push(formattedDay)
+              }
           this.consumptionGraph = true;
         })
         
@@ -39,6 +46,12 @@ export class PredictionTabularDeviceComponent {
       else{
         this.deviceService.predictionDevice(id).subscribe(production =>{
           this.list2 = production;
+          this.dateTime = [];
+              for (let i = 0; i < this.list2.length; i++) {
+                const pad = (num: number): string => (num < 10 ? '0' + num : String(num));
+                const formattedDay = `${pad(this.list2[i].day)}`;
+                this.dateTime.push(formattedDay)
+              }
           this.productionGraph = true;
         })
       }
@@ -49,8 +62,6 @@ export class PredictionTabularDeviceComponent {
 
   downloadCSV(): void {
     const deviceId = Number(this.route.snapshot.paramMap.get('id'));
-    const date = new Date();
-    const formattedDate = this.datePipe.transform(date,'dd-MM-yyyy hh:mm:ss');
     this.authService.getDevice(deviceId).subscribe(data=>{
       if(data.deviceCategory == "Electricity Consumer"){
           const options = {
@@ -61,7 +72,7 @@ export class PredictionTabularDeviceComponent {
           decimalSeparator: '.',
           showLabels: true,
           useTextFile: false,
-          headers: ['Hour', 'Day', 'Month', 'Year', 'Consumption', 'Production', 'Exported Date '+formattedDate]
+          headers: ['Hour', 'Day', 'Month', 'Year', 'Consumption [kWh]', 'Production [kWh]']
         };
         const csvExporter = new ExportToCsv(options);
         const csvData = csvExporter.generateCsv(this.list1);
@@ -75,7 +86,7 @@ export class PredictionTabularDeviceComponent {
           decimalSeparator: '.',
           showLabels: true,
           useTextFile: false,
-          headers: ['Hour', 'Month', 'Year', 'Consumption', 'Production', 'Exported Date '+formattedDate]
+          headers: ['Hour', 'Month', 'Year', 'Consumption [kWh]', 'Production [kWh]']
         };
         const csvExporter = new ExportToCsv(options);
         const csvData = csvExporter.generateCsv(this.list2);

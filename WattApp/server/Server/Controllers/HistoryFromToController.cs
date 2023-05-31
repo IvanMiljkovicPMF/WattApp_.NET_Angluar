@@ -28,10 +28,10 @@ namespace Server.Controllers
         public async Task<IActionResult> GetHistoryForCity([FromQuery] string fromDate, string toDate, 
                                                                        long deviceCategoryId,
                                                                        long cityId, long settlementId, 
-                                                                       long byMonthCityId, long byDayCityId, long byHourCityId,
-                                                                       long byMonthSettlementId, long byDaySettlementId, long byHourSettlementId, 
-                                                                       long byMonthUserId, long byDayUserId, long byHourUserId, long doubleUserId,
-                                                                       long doubleDeviceId, long byMonthDeviceId, long byHourDeviceId, long byDayDeviceId)
+                                                                       long byDayCityId, long byHourCityId,
+                                                                       long byDaySettlementId, long byHourSettlementId, 
+                                                                       long byDayUserId, long byHourUserId, long doubleUserId,
+                                                                       long doubleDeviceId, long byHourDeviceId, long byDayDeviceId)
         {
             if(cityId!=0)
             {
@@ -138,44 +138,12 @@ namespace Server.Controllers
                 var result = historyFromToService.GetDeviceHistoryByDayFromTo(fromDate, toDate, byDayDeviceId);
                 return Ok(result);
             }
-            else if (byHourDeviceId != 0)
+            else //if (byHourDeviceId != 0)
             {
                 if (!_sqliteDb.Devices.Any(d => d.Id == byHourDeviceId))
                     return NotFound(new { message = "Device with ID: " + byHourDeviceId.ToString() + " does not exist." });
 
                 var result = historyFromToService.GetDeviceHistoryByHourFromTo(fromDate, toDate, byHourDeviceId);
-                return Ok(result);
-            }
-            else if (byMonthDeviceId != 0)
-            {
-                if (!_sqliteDb.Devices.Any(d => d.Id == byMonthDeviceId))
-                    return NotFound(new { message = "Device with ID: " + byMonthDeviceId.ToString() + " does not exist." });
-
-                var result = historyFromToService.GetDeviceHistoryByMonthFromTo(fromDate, toDate, byMonthDeviceId);
-                return Ok(result);
-            }
-            else if (byMonthUserId != 0)
-            {
-                if (!_sqliteDb.Users.Any(d => d.Id == byMonthUserId))
-                    return NotFound(new { message = "User with ID: " + byMonthUserId.ToString() + " does not exist." });
-
-                var result = historyFromToService.GetProsumerHistoryByMonthFromTo(fromDate, toDate, byMonthUserId, deviceCategoryId);
-                return Ok(result);
-            }
-            else if (byMonthCityId != 0)
-            {
-                if (!_sqliteDb.Cities.Any(c => c.Id == byMonthCityId))
-                    return NotFound(new { message = "City with ID: " + byMonthCityId.ToString() + " does not exist." });
-
-                var result = historyFromToService.GetCityHistoryByMonthFromTo(fromDate, toDate, deviceCategoryId, byMonthCityId);
-                return Ok(result);
-            }
-            else // if (byMonthSettlementId != 0)
-            {
-                if (!_sqliteDb.Settlements.Any(s => s.Id == byMonthSettlementId))
-                    return NotFound(new { message = "Settlement with ID: " + byMonthSettlementId.ToString() + " does not exist." });
-
-                var result = historyFromToService.GetSettlementHistoryByMonthFromTo(fromDate, toDate, deviceCategoryId, byMonthSettlementId);
                 return Ok(result);
             }
         }
@@ -187,7 +155,8 @@ namespace Server.Controllers
         [Route("Pagination")]
         public async Task<IActionResult> GetHistoryFromDateToDatePagination([FromQuery] int pageNumber, int itemsPerPage, string fromDate, string toDate,
                                                                                         long byHourDeviceId, long deviceCategoryId, long byHourUserId,
-                                                                                        long byHourSettlementId, long byHourCityId)
+                                                                                        long byHourSettlementId, long byHourCityId, long byDayUserId,
+                                                                                        long byDayDeviceId, long byDaySettlementId, long byDayCityId)
         {
             if (pageNumber > 0 && itemsPerPage > 0)
             {
@@ -197,6 +166,9 @@ namespace Server.Controllers
                         return NotFound(new { message = "Device with ID: " + byHourDeviceId.ToString() + " does not exist." });
 
                     var result = historyFromToService.GetDeviceHistoryByHourFromToPagination(fromDate, toDate, byHourDeviceId, pageNumber, itemsPerPage);
+                    if(result == null)
+                        return NotFound(new { message = "Page " + pageNumber + " does not exist." });
+
                     return Ok(result);
                 }
                 else if (byHourUserId != 0)
@@ -205,6 +177,9 @@ namespace Server.Controllers
                         return NotFound(new { message = "User with ID: " + byHourUserId.ToString() + " does not exist." });
 
                     var result = historyFromToService.GetUserHistoryByHourFromToPagination(fromDate, toDate, byHourUserId, deviceCategoryId, pageNumber, itemsPerPage);
+                    if (result == null)
+                        return NotFound(new { message = "Page " + pageNumber + " does not exist." });
+
                     return Ok(result);
                 }
                 else if (byHourSettlementId != 0)
@@ -213,14 +188,64 @@ namespace Server.Controllers
                         return NotFound(new { message = "Settlement with ID: " + byHourSettlementId.ToString() + " does not exist." });
 
                     var result = historyFromToService.GetSettlementHistoryByHourFromToPagination(fromDate, toDate, byHourSettlementId, deviceCategoryId, pageNumber, itemsPerPage);
+                    if (result == null)
+                        return NotFound(new { message = "Page " + pageNumber + " does not exist." });
+
                     return Ok(result);
                 }
-                else //if (byHourCityId != 0)
+                else if (byHourCityId != 0)
                 {
                     if (!_sqliteDb.Cities.Any(c => c.Id == byHourCityId))
                         return NotFound(new { message = "City with ID: " + byHourCityId.ToString() + " does not exist." });
 
                     var result = historyFromToService.GetCityHistoryByHourFromToPagination(fromDate, toDate, byHourCityId, deviceCategoryId, pageNumber, itemsPerPage);
+                    if (result == null)
+                        return NotFound(new { message = "Page " + pageNumber + " does not exist." });
+
+                    return Ok(result);
+                }
+                else if (byDayUserId != 0)
+                {
+                    if (!_sqliteDb.Users.Any(u => u.Id == byDayUserId))
+                        return NotFound(new { message = "User with ID: " + byDayUserId.ToString() + " does not exist." });
+
+                    var result = historyFromToService.GetUserHistoryByDayFromToPagination(fromDate, toDate, byDayUserId, deviceCategoryId, pageNumber, itemsPerPage);
+                    if (result == null)
+                        return NotFound(new { message = "Page " + pageNumber + " does not exist." });
+
+                    return Ok(result);
+                }
+                else if (byDayDeviceId != 0)
+                {
+                    if (!_sqliteDb.Devices.Any(u => u.Id == byDayDeviceId))
+                        return NotFound(new { message = "Device with ID: " + byDayDeviceId.ToString() + " does not exist." });
+
+                    var result = historyFromToService.GetDeviceHistoryByDayFromToPagination(fromDate, toDate, byDayDeviceId, pageNumber, itemsPerPage);
+                    if (result == null)
+                        return NotFound(new { message = "Page " + pageNumber + " does not exist." });
+
+                    return Ok(result);
+                }
+                else if (byDaySettlementId != 0)
+                {
+                    if (!_sqliteDb.Settlements.Any(s => s.Id == byDaySettlementId))
+                        return NotFound(new { message = "Settlement with ID: " + byDaySettlementId.ToString() + " does not exist." });
+
+                    var result = historyFromToService.GetSettlementHistoryByDayFromToPagination(fromDate, toDate, byDaySettlementId, deviceCategoryId, pageNumber, itemsPerPage);
+                    if (result == null)
+                        return NotFound(new { message = "Page " + pageNumber + " does not exist." });
+
+                    return Ok(result);
+                }
+                else //if (byDayCityId != 0)
+                {
+                    if (!_sqliteDb.Cities.Any(c => c.Id == byDayCityId))
+                        return NotFound(new { message = "City with ID: " + byDayCityId.ToString() + " does not exist." });
+
+                    var result = historyFromToService.GetCityHistoryByDayFromToPagination(fromDate, toDate, byDayCityId, deviceCategoryId, pageNumber, itemsPerPage);
+                    if (result == null)
+                        return NotFound(new { message = "Page " + pageNumber + " does not exist." });
+
                     return Ok(result);
                 }
             }

@@ -1,10 +1,52 @@
+<div *ngIf="loader" style="display: inline; justify-content: center;align-items: center;"><app-loader></app-loader></div>
 <div class="table-responsive">
-    <table *ngIf="data?.length!=0" class="table">
+    <div class="filters" *ngIf="showFilters">
+        <div class="first-row">
+            <div class="form-group">
+                <select class="form-select">
+                    <option>Male Pcelice</option>
+                    <option>Bubanj</option>
+                </select>
+            </div>
+
+            <div class="value-comparation">
+                <div class="form-group">
+                    <select class="form-select" [(ngModel)]="filters.categoryId">
+                        <option value="1">Production</option>
+                        <option value="2">Consumption</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <select class="form-select"  [(ngModel)]="filters.greaterThan">
+                        <option value="1">Greater</option>
+                        <option value="0">Less</option>
+                    </select>
+                </div>
+
+                <div class="label-than">than</div>
+
+
+                <div class="form-group">
+                    <input class="custom-input" type="number" min="0" placeholder="Enter value" [(ngModel)]="filters.value">
+                </div>
+
+                <div class="clear-label">
+                    <a href="#">Clear</a>
+                </div>
+            </div>
+
+
+            <div class="form-group">
+                <input class="custom-input" id="search" type="text" placeholder="Search prosumers by name, username or address" [(ngModel)]="filters.searchValue">
+            </div>
+        </div>
+    </div>
+    <table *ngIf="data?.length!=0 && !loader" class="table" >
         <thead>
             <tr>
                 <th>#</th>
                 <th scope="col">Name</th>
-                <!-- <th>email</th> -->
                 <th scope="col">Settlement</th>
                 <th scope="col">City</th>
                 <th scope="col">Country</th>
@@ -13,17 +55,16 @@
             </tr>
         </thead>
         <tbody>
-            <tr *ngFor="let prosumer of data | paginate: {currentPage,itemsPerPage,totalItems}let i = index ">
+            <tr [routerLink]='["/prosumer/"+prosumer.userDetailsDTO.id]' id="show-prosumer" *ngFor="let prosumer of data | paginate: {currentPage,itemsPerPage,totalItems}let i = index ">
                 <td>{{ (currentPage - 1) * itemsPerPage + i +1 }}</td>
-                <td><a [routerLink]='["/prosumer/"+prosumer.userDetailsDTO.id]'>{{prosumer.userDetailsDTO.name}}</a></td>
+                <td><a id="names" class="hovered-link"[routerLink]='["/prosumer/"+prosumer.userDetailsDTO.id]'>{{prosumer.userDetailsDTO.name}}</a></td>
                 <td>{{prosumer.userDetailsDTO.settlement}}</td>
                 <td>{{prosumer.userDetailsDTO.city}}</td>
                 <td>{{prosumer.userDetailsDTO.country}}</td>
                 <td>{{prosumer.currentConsumption}} kWh</td>
                 <td>{{prosumer.currentProduction}} kWh</td>
-
             </tr>
         </tbody>
     </table>
-    <app-page-control (pageChange)="pageChanged($event)" *ngIf="itemsPerPage<totalItems"></app-page-control>
+    <app-page-control (pageChange)="pageChanged($event)" *ngIf="itemsPerPage<totalItems" [class.hidden]="loader"></app-page-control>
 </div>

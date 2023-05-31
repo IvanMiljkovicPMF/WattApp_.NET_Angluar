@@ -1,8 +1,8 @@
 import { Injectable} from '@angular/core';
 import {HttpClient, HttpErrorResponse, HttpHeaders, HttpResponse} from '@angular/common/http';
 import { environment } from 'src/environments/environment';
-import { BehaviorSubject, catchError, map, Observable, of } from 'rxjs';
-import { Prosumers, Settlement, Users } from '../models/users.model';
+import { BehaviorSubject, catchError, filter, map, Observable, of } from 'rxjs';
+import { LogedUser, Prosumers, Settlement, Users } from '../models/users.model';
 import { JwtToken } from '../utilities/jwt-token';
 
 @Injectable({
@@ -61,6 +61,35 @@ export class AuthService {
   {
     return this.http.get<any>(environment.serverUrl+'/api/ProsumersDetails/page/?pageNumber=1&cityId=-1&pageSize=10',{headers:{"Authorization":"Bearer "+localStorage.getItem('token')}});
   }
+  getAllProsumersFilter(pageNumber:number,pageSize:number,filters:any):Observable<any>
+  {
+    let url = new URL(environment.serverUrl + "/api/ProsumersDetails/page/filters" );
+    url.searchParams.set("pageNumber", pageNumber.toString());
+    url.searchParams.set("pageSize", pageSize.toString());
+
+    url.searchParams.set("sortCriteria", "0");
+    url.searchParams.set("byAscending", "true");
+
+    if(filters == null)
+      return this.http.get<any>(url.toString(),{headers:{"Authorization":"Bearer "+localStorage.getItem('token')}});
+    else{
+      if(filters.value != 0){
+        if(filters.greaterThan == 1)
+          url.searchParams.set("greaterThan", "true");
+        else
+          url.searchParams.set("greaterThan", "false");
+
+        if(filters.categoryId > 0){
+          url.searchParams.set("DeviceCategoryId", filters.categoryId);
+        }
+      }
+
+      if(filters.searchValue != ""){
+        url.searchParams.set("SearchValue", filters.searchValue);
+      }
+    }
+    return this.http.get<any>(url.toString(),{headers:{"Authorization":"Bearer "+localStorage.getItem('token')}});
+  }
   addUsers(addUserRequest:any):Observable<any>
   {
     
@@ -90,9 +119,9 @@ export class AuthService {
   {
     return this.http.get<any>(environment.serverUrl+"/api/users/my_data",{headers:{"Authorization":"Bearer "+localStorage.getItem('token')}});
   }
-  upDateLogedIn(updateRequest:Prosumers):Observable<Prosumers>
+  upDateLogedIn(updateRequest:LogedUser):Observable<LogedUser>
   {
-    return this.http.put<Prosumers>(environment.serverUrl+'/api/users',updateRequest,{headers:{"Authorization":"Bearer "+localStorage.getItem('token')}});
+    return this.http.put<LogedUser>(environment.serverUrl+'/api/users',updateRequest,{headers:{"Authorization":"Bearer "+localStorage.getItem('token')}});
   }
   
   delete(id:number):Observable<Users>
@@ -129,10 +158,8 @@ export class AuthService {
   getSettlement(cityId:number):Observable<Settlement[]>{
     return this.http.get<Settlement[]>(environment.serverUrl+"/settlements?cityId="+cityId,{headers:{"Authorization":"Bearer "+localStorage.getItem('token')}});
   }
-  getNumberOfDevices(id:number):Observable<any>
-  {
-    return this.http.get<any>(environment.serverUrl+'/api/Prosumer/numberOfDevices/'+id,{headers:{"Authorization":"Bearer "+localStorage.getItem('token')}});
-
+  getNumberOfDevices(userId : number):Observable<any>{
+    return this.http.get<any>(environment.serverUrl+"/api/Prosumer/numberOfDevices/" + userId,{headers:{"Authorization":"Bearer "+localStorage.getItem('token')}});
   }
   getMyLocation(): Observable<{ latitude: number, longitude: number }> {
     const url = `${environment.serverUrl}/api/Users/my_location`;
@@ -149,4 +176,5 @@ export class AuthService {
       })
     );
     }
+
 }

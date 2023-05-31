@@ -1,6 +1,9 @@
 import { Component, ElementRef, ViewChildren, QueryList, ViewChild, OnInit} from '@angular/core';
 import { forkJoin } from 'rxjs';
+import { DeviceFilterModel } from 'src/app/components/prosumers/devices/all-devices/all-devices.component';
+import { WeekByDay } from 'src/app/models/devices.model';
 import { HistoryPredictionService } from 'src/app/services/history-prediction.service';
+import { SessionService } from 'src/app/services/session.service';
 import { JwtToken } from 'src/app/utilities/jwt-token';
 
 @Component({
@@ -29,9 +32,30 @@ export class ProsumerReportsPageComponent implements OnInit {
   todayP:number = 0;
   monthC:number = 0;
   monthP:number = 0;
-  constructor(private elementRef: ElementRef,private historyService:HistoryPredictionService) {}
+  idPro!: number;
+  maxc!: number;
+  maxp!: number;
+  meter!:string;
+  meter1!:string;
+  meter2!:string;
+  meter3!:string;
+  meter4!:string;
+  constructor(private elementRef: ElementRef,private historyService:HistoryPredictionService, private sessionService : SessionService) {}
   ngOnInit(): void {
     let token=new JwtToken();
+    this.sessionService.setSession("filter", new DeviceFilterModel(
+      0, 
+      0, 
+      0, 
+      -1, 
+      -1, 
+      -1,
+      1, 
+      1, 
+      0, 
+      0, 
+      ""
+    ));
     const id = token.data.id as number;
     this.isContentVisible = true;
     this.isContentVisible1 = false;
@@ -45,10 +69,84 @@ export class ProsumerReportsPageComponent implements OnInit {
       this.historyService.monthConsumptionUser(id, 1),
     ]).subscribe(([todayC, todayP, monthC, monthP]) => {
       this.todayC = todayC;
+      this.meter1=" kWh"
+      if(this.todayC>999.99)
+      {
+        this.todayC=parseFloat((this.todayC*0.001).toFixed(2));
+        this.meter1=" MWh";
+        if(this.todayC>999.99)
+        {
+          this.todayC=parseFloat((this.todayC*0.001).toFixed(2));
+          this.meter1=" GWh";
+        }
+      }
       this.todayP = todayP;
+      this.meter2=" kWh"
+      if(this.todayP>999.99)
+      {
+        this.todayP=parseFloat((this.todayP*0.001).toFixed(2));
+        this.meter2=" MWh";
+        if(this.todayP>999.99)
+        {
+          this.todayP=parseFloat((this.todayP*0.001).toFixed(2));
+          this.meter2=" GWh";
+        }
+      }
       this.monthC = monthC;
+      this.meter3=" kWh"
+      if(this.monthC>999.99)
+      {
+        this.monthC=parseFloat((this.monthC*0.001).toFixed(2));
+        this.meter3=" MWh";
+        if(this.monthC>999.99)
+        {
+          this.monthC=parseFloat((this.monthC*0.001).toFixed(2));
+          this.meter3=" GWh";
+        }
+      }
       this.monthP = monthP;
+      this.meter4=" kWh"
+      if(this.monthP>999.99)
+      {
+        this.monthP=parseFloat((this.monthP*0.001).toFixed(2));
+        this.meter4=" MWh";
+        if(this.monthP>999.99)
+        {
+          this.monthP=parseFloat((this.monthP*0.001).toFixed(2));
+          this.meter4=" GWh";
+        }
+      }
     });
+    this.idPro=token.data.id as number;
+    this.historyService.predictionUser(this.idPro,2).subscribe((data: WeekByDay[]) =>{
+      this.maxc=parseFloat(data.reduce((total,row)=> total+row.energyUsageResult,0).toFixed(2));
+      this.meter=" kWh"
+      if(this.maxc>999.99)
+      {
+        this.maxc=parseFloat((this.maxc*0.001).toFixed(2));
+        this.meter=" MWh"
+        if(this.maxc>999.99)
+        {
+          this.maxc=parseFloat((this.maxc*0.001).toFixed(2));
+          this.meter=" GWh"
+        }
+      }
+      })
+      this.historyService.predictionUser(this.idPro,1).subscribe((data: WeekByDay[]) =>{
+        this.maxp=parseFloat(data.reduce((total,row)=> total+row.energyUsageResult,0).toFixed(2));
+        this.meter=" kWh"
+        if(this.maxp>999.99)
+        {
+          this.maxp=parseFloat((this.maxp*0.001).toFixed(2));
+          this.meter=" MWh";
+          if(this.maxp>999.99)
+          {
+            this.maxp=parseFloat((this.maxp*0.001).toFixed(2));
+            this.meter=" GWh";
+          }
+        }
+        })
+
   }
 
   toggleD()

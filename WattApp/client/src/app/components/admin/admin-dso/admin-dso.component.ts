@@ -1,11 +1,11 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { AfterViewInit, Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ShowUsers, Users } from 'src/app/models/users.model';
 import { AuthService } from 'src/app/services/auth.service';
 import { environment } from 'src/environments/environment';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, Validators } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 @Component({
   selector: 'app-admin-dso',
@@ -15,8 +15,15 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 export class AdminDsoComponent implements OnInit {
   @ViewChild('modalContent') modalContent!: TemplateRef<any>;
   @ViewChild('modalContent1') modalContent1!: TemplateRef<any>;
+  @ViewChild('modalContent2') modalContent2!: TemplateRef<any>;
   body: string = ''; 
   btnAction:string='';
+
+  userForm=this.fb.group({
+
+    email:['',[Validators.required,Validators.email]],
+    
+  })
 
 	currentPage:number=1;
 	itemsPerPage:number=10;
@@ -28,13 +35,12 @@ export class AdminDsoComponent implements OnInit {
   settlements:any[]=[];
   loading:boolean=true;
   public filters={
-	blocked:-1,
-	role:0,
-	settlement:0,
-	city:0,
-	name:''
+    blocked:-1,
+    role:0,
+    settlement:0,
+    city:0,
+    name:''
   };
-
   onBlockClick!: (this: HTMLElement, ev: MouseEvent) => any;
   onUnblockClick!: (this: HTMLElement, ev: MouseEvent) => any;
   oneUser?:string;
@@ -53,13 +59,11 @@ export class AdminDsoComponent implements OnInit {
   address: '',
   password: ''
   }
-  public emailErrorMessage:string="";
-	public errorMessage:string="";
 	public success:boolean=false;
-  public passwordGen='';
-  public emailUp='';
+  showDropdown = false;
+  msgShow:boolean=false;
   constructor(private router:Router,private usersService:AuthService,
-    private route:ActivatedRoute,private modalService: NgbModal) { }
+    private route:ActivatedRoute,private modalService: NgbModal,private elementRef: ElementRef,private fb:FormBuilder) { }
 
 	getSettlements(){
 
@@ -82,16 +86,6 @@ export class AdminDsoComponent implements OnInit {
 		this.cities=res
   	});
   }
-  isOpen = false;
-
-  toggleDropdown() {
-    this.isOpen = !this.isOpen;
-  }
-
-  closeDropdown() {
-    this.isOpen = false;
-  }
-  
 	pageChanged(pageNumber:number){
 		this.currentPage=pageNumber;
 		this.loading=true;
@@ -185,7 +179,6 @@ export class AdminDsoComponent implements OnInit {
         deletePopup.addEventListener('click', () => {
           this.usersService.delete(id)
           .subscribe(()=>{
-              //this.router.navigate(['/dashboard']);
               this.usersService.getAllUsers(this.currentPage,this.itemsPerPage,this.filters).subscribe({
 				next:users => {
                 this.totalItems=users.numberOfPages*this.itemsPerPage;
@@ -264,31 +257,70 @@ export class AdminDsoComponent implements OnInit {
   }
   upDate()
   {
+    
     this.usersService.upDate(this.updateUserDetail.id,this.updateUserDetail)
     .subscribe({
       next:()=>{
+        this.modalService.open(this.modalContent2);
+        this.body="Email confirmation has been successfully sent to the user's email."
         this.router.navigate(['dashboard']);
+      },error:()=>{
+        this.modalService.open(this.modalContent2);
+        this.body="User with that email address already exists."
+        this.router.navigate(['dashboard']);
+        
       }
     });
   }
-  // countChecked(): number {
-  //   let count = 0;
-  //   for (let prop in this.filters) {
-  //     if (this.filters.hasOwnProperty(prop)) {
-  //       if (Array.isArray(this.filters[prop])) {
-  //         count += this.filters[prop].filter(val => val).length;
-  //       } else {
-  //         count += this.filters[prop] ? 1 : 0;
-  //       }
-  //     }
-  //   }
-  //   return count;
-  // }
+
+  toggleDropdown() {
+    this.showDropdown = !this.showDropdown;
+  }
+  @HostListener('document:click', ['$event'])
+  onClick(event: MouseEvent) {
+    const clickedElement = event.target as HTMLElement;
+    const dropdownElement = this.elementRef.nativeElement;
+    const navbarElement = dropdownElement.querySelector('#dropbtn1') as HTMLElement;
+    const dropdownContent = dropdownElement.querySelector('.dropdown-content') as HTMLElement;
+
+    if (!dropdownElement.contains(clickedElement) || (!navbarElement.contains(clickedElement) && !dropdownContent.contains(clickedElement))) {
+      this.showDropdown = false;
+    }
+  }
+  countActiveFilters() {
+    let count = 0;
+    if (this.filters.blocked !== -1) {
+      count++;
+    }
+    if (this.filters.role !== 0) {
+      count++;
+    }
+    if (this.filters.settlement !== 0) {
+      count++;
+    }
+    if (this.filters.city !== 0) {
+      count++;
+    }
+    if (this.filters.name.trim() !== '') {
+      count++;
+    }
+  
+    return count;
+  }
+  clearFilters() {
+    this.filters = {
+      blocked:-1,
+      role:0,
+      settlement:0,
+      city:0,
+      name:''
+    };
+    this.pageChanged(1); 
+  }
   logout()
   {
     localStorage.removeItem('token');
     this.usersService.isLoginSubject.next(false)
     this.router.navigate(['/login']);
   }
-
 }

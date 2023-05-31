@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "fFw/wit/Q8M+u/sIed2KRAHk4pjuzXbJoFSpozD4a7lIMZQFwmCp8O4MO22G23j99V6Wct+Zfn5mkbHnkXywdQ==",
+  "dgSpecHash": "9vCkx0qk1HS7ed4eI20wN7OK/8A0yoOkziv60jQVYxU5UHJ6cxIr4Ho3p1h/H7tsB0aS6M2SZ3WAQ5IVAsRFhw==",
   "success": true,
   "projectFilePath": "C:\\Users\\Miljkovic\\Desktop\\FAKS\\Moji_projekti\\SI\\electricassist\\WattApp\\server\\Server\\Server.csproj",
   "expectedPackageFiles": [
@@ -46,6 +46,7 @@
     "C:\\Users\\Miljkovic\\.nuget\\packages\\mimekit\\3.6.0\\mimekit.3.6.0.nupkg.sha512",
     "C:\\Users\\Miljkovic\\.nuget\\packages\\polly\\7.2.3\\polly.7.2.3.nupkg.sha512",
     "C:\\Users\\Miljkovic\\.nuget\\packages\\portable.bouncycastle\\1.9.0\\portable.bouncycastle.1.9.0.nupkg.sha512",
+    "C:\\Users\\Miljkovic\\.nuget\\packages\\python.runtime\\2.7.9\\python.runtime.2.7.9.nupkg.sha512",
     "C:\\Users\\Miljkovic\\.nuget\\packages\\runtime.native.system.data.sqlclient.sni\\4.7.0\\runtime.native.system.data.sqlclient.sni.4.7.0.nupkg.sha512",
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder\\runtime.win-arm64.runtime.native.system.data.sqlclient.sni\\4.4.0\\runtime.win-arm64.runtime.native.system.data.sqlclient.sni.4.4.0.nupkg.sha512",
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder\\runtime.win-x64.runtime.native.system.data.sqlclient.sni\\4.4.0\\runtime.win-x64.runtime.native.system.data.sqlclient.sni.4.4.0.nupkg.sha512",

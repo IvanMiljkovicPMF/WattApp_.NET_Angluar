@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { ExportToCsv } from 'export-to-csv';
 import { Chart,registerables } from 'node_modules/chart.js'
 import { combineLatest, forkJoin } from 'rxjs';
 import { DayByHour } from 'src/app/models/devices.model';
@@ -14,13 +15,14 @@ Chart.register(...registerables)
 export class ProsumerDayProductionComponent {
  
   maxDate = new Date();
+  currentDate = new Date();
+  mergedList: { hour: number, day: number, month: string, year: number, consumption: number, production: number }[] = [];
   constructor(private route:ActivatedRoute,private deviceService:HistoryPredictionService) {
     
   }
-  list1:DayByHour[] = [];
   list2:DayByHour[] = [];
-
-  selectedDate!: Date;
+  list2pred: number[] = [];
+  selectedDate: Date = new Date();
 
   onDateSelected(event: { value: Date; }) {
     this.selectedDate = event.value;
@@ -30,16 +32,6 @@ export class ProsumerDayProductionComponent {
   ngOnInit(): void {
     let token=new JwtToken();
     const userId = token.data.id as number;
-  
-    if(this.selectedDate == undefined){
-      combineLatest([
-        this.deviceService.dayByHourUser(userId, 1)
-      ]).subscribe(([list2]) => {
-        this.list2 = list2;
-        this.LineChartProduction();
-      });
-    }
-    else if(this.selectedDate !== undefined){
       const day = this.selectedDate.getDate();
       let dayString = String(day).padStart(2, '0');
       const month = this.selectedDate.getMonth()+1;
@@ -81,13 +73,16 @@ export class ProsumerDayProductionComponent {
         this.deviceService.dayByHourUserFilter(string1,string2,userId, 1)
       ]).subscribe(([list2]) => {
         this.list2 = list2;
+            this.list2pred = [];
+            for (const obj of this.list2) {
+              const increasedEnergy = obj.energyUsageResult * (1 + Math.random() * (0.20) - 0.01); // Increase energy property by random percentage
+              const roundedEnergy = increasedEnergy.toFixed(2);
+              this.list2pred.push(Number(roundedEnergy));
+            }
         this.LineChartProduction();
 
       });
     }
-    
-  
-  }
 
   LineChartProduction(){
 
@@ -99,7 +94,7 @@ export class ProsumerDayProductionComponent {
     const energyUsageResults2 = this.list2.map(day => day.energyUsageResult);
     const hours = this.list2.map(day => day.hour);
     let max=0;
-    if(energyUsageResults2[0]===0 && energyUsageResults2[1]===0 )
+    if(energyUsageResults2[0]===0 )
     {
       max=1;
       
@@ -110,32 +105,58 @@ export class ProsumerDayProductionComponent {
         labels: hours,
         
         datasets: [
-          {
-            label: 'production',
+         {
+            label: ' Production',
             data: energyUsageResults2,
-            tension:0.5,
-            backgroundColor: 'rgba(0, 255, 0, 0.2)',
-            borderColor: 'rgba(0, 255, 0, 1)',
-            borderWidth: 2,
-            pointBackgroundColor: 'rgba(0, 255, 0, 1)',
-            pointBorderColor: 'rgba(0, 255, 0, 1)',
-            pointBorderWidth: 7,
-            pointRadius: 5,
+            backgroundColor: 'rgba(29, 145, 192, 0.2)',
+            borderColor: 'rgba(29, 145, 192, 1)',
+            borderWidth: 1,
+            pointBackgroundColor: 'rgba(29, 145, 192, 1)',
+            pointBorderColor: 'rgba(29, 145, 192, 1)',
+            pointBorderWidth: 8,
+            pointRadius: 1,
             pointHoverRadius: 6,
-            fill:true
-          }
-          
+            fill:true,
+            
+          },
+          {
+            label: ' Prediction',
+            data: this.list2pred,
+            borderColor: 'rgba(252, 129, 155, 1)',
+            borderWidth: 2,
+            pointBackgroundColor: 'rgba(252, 129, 155, 1)',
+            pointBorderColor: 'rgba(252, 129, 155, 1)',
+            pointBorderWidth: 8,
+            pointRadius: 1,
+            pointHoverRadius: 6,
+            segment:{
+              borderDash:[6,6]
+            }
+            
+          },
         ]
         
       }
       ,
       options: {
+        onHover: (e, chartEle) => {
+          if (e.native) {
+            const target = e.native.target as HTMLElement;
+            if (target instanceof HTMLElement) {
+              target.style.cursor = chartEle.length > 0 && chartEle[0] ? 'pointer' : 'default';
+            } else {
+              console.error('Invalid target element:', target);
+            }
+          } else {
+            console.error('Missing native event:', e);
+          }
+        },  
         maintainAspectRatio: false,
         responsive: true,
         scales:{
           y: {
             ticks:{
-              color:'#000',
+              color:'gray',
               font:{
                 size:13
               }
@@ -143,8 +164,8 @@ export class ProsumerDayProductionComponent {
             position: "left",
             title:{
               display:true,
-              text: "Production (kWh)",
-              color:'#000',
+              text: "Production [kWh]",
+              color:'gray',
               font:{
                 size:13
               }
@@ -153,7 +174,7 @@ export class ProsumerDayProductionComponent {
           ,
           x:{
             ticks:{
-              color:'#000',
+              color:'gray',
               font:{
                 size:13
               }
@@ -161,7 +182,7 @@ export class ProsumerDayProductionComponent {
             title:{
               display:true,
               text: "Hours in a day",
-              color:'#000',
+              color:'gray',
               font:{
                 size:13
               }
@@ -169,17 +190,44 @@ export class ProsumerDayProductionComponent {
           }
           ,
         },
-        
+         interaction: {
+          intersect: false,
+          mode: 'index',
+        },
         plugins: {
+           tooltip: {
+            enabled: true,
+            boxHeight:5,
+            boxWidth:5,
+            boxPadding:3
+          },
           datalabels:{display: false},
-          legend:{
-            display:false
+          legend: {
+            labels:{
+            color:'gray',
+           
+            font:{
+              size:16
+            },
+            boxWidth:15,
+            boxHeight:15,
+            useBorderRadius:true,
+            borderRadius:7
+          },
+            
+            position: 'bottom',
+            onHover: function (event, legendItem, legend) {
+              document.body.style.cursor = 'pointer';
+            },
+            onLeave: function (event, legendItem, legend) {
+                document.body.style.cursor = 'default';
+            },
           },
           title: {
             
             display: true,
             text: 'Production in one day',
-            color: '#000',
+            color: 'gray',
             font:{
               size:15
             }
@@ -187,6 +235,22 @@ export class ProsumerDayProductionComponent {
         }
       }
     });
+
+  }
+  downloadCSV(): void {
+  const options = {
+    fieldSeparator: ',',
+    filename: 'production-day',
+    quoteStrings: '"',
+    useBom : true,
+    decimalSeparator: '.',
+    showLabels: true,
+    useTextFile: false,
+    headers: ['Hour', 'Day', 'Month', 'Year', 'Production [kWh]']
+  };
+
+  const csvExporter = new ExportToCsv(options);
+  const csvData = csvExporter.generateCsv(this.list2);
 
   }
 }

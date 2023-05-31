@@ -1,28 +1,27 @@
-import { Component, OnInit, TemplateRef, ViewChild,ElementRef  } from '@angular/core';
-import { ActivatedRoute, NavigationCancel, NavigationEnd, NavigationStart, Router, RouterLinkWithHref } from '@angular/router';
+import { Component, OnInit  } from '@angular/core';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
 import { Roles } from '../../utilities/role'
 import { JwtToken } from 'src/app/utilities/jwt-token';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Location } from '@angular/common';
-import { Renderer2 } from '@angular/core';
 @Component({
   selector: 'app-sidebar',
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.css']
 })
 export class SidebarComponent implements OnInit{
-  @ViewChild('modalContent') modalContent!: TemplateRef<any>;
-  onClickLeave!: (this: HTMLElement, ev: MouseEvent) => any;
   role?:string;
   admin?:string;
   superadmin?:string;
   dso?:string;
   prosumer?:string;
-  currentUrl: string = '';
+  currentUrl?: string;
+  tab?:string;
+  showLink:boolean=false;
+  showLink1:boolean=false;
+  id?:string;
   constructor(public router:Router,private usersService:AuthService,
-    public route:ActivatedRoute,private modalService: NgbModal,private location: Location,
-    private renderer: Renderer2,private elRef: ElementRef) { 
+    public route:ActivatedRoute,private location: Location,) { 
 
       this.admin=Roles.ADMIN_NAME;
       this.dso=Roles.DISPATCHER_NAME;
@@ -32,6 +31,53 @@ export class SidebarComponent implements OnInit{
        
     }
   ngOnInit(): void {
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationEnd) {
+        const path = this.location.path(); 
+        const segments = path.split('/'); 
+        this.id = segments[segments.length - 1]; 
+        this.showLink=this.showLink1=false
+        if(event.url==='/prosumers?tab=table')
+        {
+          this.tab='table';
+          this.showLink=false
+        }
+        else  if(event.url==='/prosumers?tab=map')
+        {
+          this.tab='map';
+          this.showLink=false
+        }
+        else if(event.url==='/prosumer/'+this.id)
+        {
+          if(this.tab==='map')
+          {
+            this.tab='map';
+          }
+          else (this.tab==='table')
+          {
+            this.tab='table';
+          }
+          this.showLink=true
+          
+        }
+        else if(event.url==='/device/'+this.id ||event.url==='/device-update/'+this.id || event.url==='/device-add')
+        {
+          this.showLink=true
+        }
+        else if(event.url==='/devices')
+        {
+          this.showLink=false
+        }
+        else if(event.url==='/profile')
+        {
+          this.showLink1=false
+        }
+        else if(event.url==='/profile-edit' || event.url==='/prosumer-change-password')
+        {
+          this.showLink1=true
+        }
+      }
+    });
     let token=new JwtToken();
     this.role=token.data.role as string;
 
@@ -55,48 +101,8 @@ export class SidebarComponent implements OnInit{
   toggleSidebarContent() {
     this.showSidebarContent = !this.showSidebarContent;
   }
-  clickSidebar(event: Event, url: string) {
-    event.preventDefault();
-  
-    if(this.location.path() === '/add-user')
-    {
-      this.router.navigateByUrl('/add-user');
-      if (url !== '/add-user') {
-      
-        this.modalService.open(this.modalContent);
-        const controlabilityOnPopup = document.getElementById('popup');
-        if (controlabilityOnPopup != null) {
-          controlabilityOnPopup.removeEventListener('click', this.onClickLeave);
-          this.onClickLeave = () => {
-            this.modalService.dismissAll();
-            this.router.navigateByUrl(url);
-            controlabilityOnPopup.removeEventListener('click', this.onClickLeave);
-          };
-          controlabilityOnPopup.addEventListener('click', this.onClickLeave);
-        }
-      }
-    }
-    if(this.location.path() === '/profile-admin')
-    {
-      this.router.navigateByUrl('/profile-admin');
-      if (url !== '/profile-admin') {
-      
-        this.modalService.open(this.modalContent);
-        const controlabilityOnPopup = document.getElementById('popup');
-        if (controlabilityOnPopup != null) {
-          controlabilityOnPopup.removeEventListener('click', this.onClickLeave);
-          this.onClickLeave = () => {
-            this.modalService.dismissAll();
-            this.router.navigateByUrl(url);
-            controlabilityOnPopup.removeEventListener('click', this.onClickLeave);
-          };
-          controlabilityOnPopup.addEventListener('click', this.onClickLeave);
-        }
-      }
-    }
-    
-    
-  }
+ 
+
   logout()
   {
     localStorage.removeItem('token');

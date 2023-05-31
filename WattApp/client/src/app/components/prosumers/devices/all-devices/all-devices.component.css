@@ -15,22 +15,28 @@
     border-bottom: 1px solid rgb(197, 233, 230);
     position: relative;
     height: auto;
+    width: 100%;
 }
 
 #allh1 {
     padding-left: 15px;
     padding-top: 15px;
-    font-size: 15px;
+    font-size: 20px;
 }
 
 .btn {
-    background-color: #1C315E;
-    border-color: #1C315E;
+    background-color: #354871;
+    border-color: #354871;
     margin-top: -35px;
     position: relative;
     float: right;
     font-size: 14px;
-    margin-right: 5px;
+    margin-right: 15px;
+    text-align: center;
+}
+
+.btn>span {
+    font-size: 16px;
 }
 
 .devices {
@@ -56,7 +62,7 @@
 
 #deviceh3 {
     padding-top: 10px;
-    font-size: 14px;
+    font-size: 16px;
 }
 
 #imgdevice {
@@ -86,13 +92,6 @@
     margin: 5px;
 }
 
-#deviceCategoryId {
-    width: 41%;
-    font-size: 12px;
-    margin-left: 26%;
-    margin-top: -35px;
-}
-
 label {
     display: inline-block;
     font-size: 15px;
@@ -105,14 +104,78 @@ label {
     font-size: 20px;
 }
 
+.custom-select {
+    cursor: pointer;
+}
+
+.filter {
+    display: flex;
+    flex-direction: column;
+}
+
+.first-row {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    margin-bottom: 5px;
+}
+
+.form-group {
+    width: 50%;
+}
+
+.form-group>select {
+    width: 90%;
+    margin: auto;
+}
+
+option {
+    font-size: 12px;
+    width: 90%;
+}
+
+#search {
+    width: 95%;
+    margin-left: 2.5%;
+    margin-right: 2.5%;
+    margin-bottom: 2px;
+    height: 40px;
+    border: none;
+    padding-left: 15px;
+}
+
+.label {
+    display: flex;
+    flex-direction: row;
+}
+
+.clear-filters {
+    text-decoration: none;
+    font-size: 18px;
+    position: absolute;
+    right: 3%;
+}
+
+.label>h2 {
+    font-size: 18px;
+    padding-left: 15px;
+}
+
+.custom-select {
+    cursor: pointer;
+}
+
 @media (min-width: 768px) {
     .alldevices {
         top: 10%;
         position: absolute;
     }
+    .adddevices {
+        margin-left: -1%;
+    }
     #allh1 {
         font-size: 30px;
-        padding-left: 12%;
+        padding-left: 16%;
         padding-bottom: 15px;
     }
     #imgdevice {
@@ -127,19 +190,23 @@ label {
         width: 75%;
     }
     #deviceh3 {
-        font-size: 35px;
+        font-size: 21px;
     }
     .devices-item {
         padding: 10px;
-        width: 25%;
+        width: 29%;
+    }
+    .devices {
+        padding-left: 85px;
+        width: 100%;
     }
     .btn {
-        background-color: #1C315E;
-        border-color: #1C315E;
+        background-color: #354871;
+        border-color: #354871;
         margin-top: -55px;
         font-size: 20px;
         width: 200px;
-        margin-right: 8%;
+        margin-right: 5%;
     }
     #deviceCategoryId {
         width: 20%;
@@ -156,5 +223,82 @@ label {
     #nodevices {
         margin-top: 10%;
         font-size: 40px;
+    }
+    .filter {
+        display: inline-block;
+        width: 100%;
+        flex-direction: column;
+    }
+    .first-row {
+        display: flex;
+        flex-direction: row;
+        margin-left: 14%;
+        margin-bottom: 5px;
+        width: 83%;
+    }
+    .form-group {
+        width: 50%;
+    }
+    .form-group>select {
+        font-size: 20px;
+        width: 90%;
+        margin: auto;
+    }
+    option {
+        font-size: 16px;
+        width: 90%;
+    }
+    #search {
+        width: 45%;
+        margin-right: 2.5%;
+        margin-bottom: 2px;
+        height: 40px;
+        border: none;
+        padding-left: 15px;
+    }
+    .label {
+        display: flex;
+        flex-direction: row;
+        margin-left: 14%;
+    }
+    .clear-filters {
+        text-decoration: none;
+        font-size: 24px;
+        position: absolute;
+        right: 42px;
+    }
+    .label>h2 {
+        font-size: 24px;
+        padding-left: 15px;
+    }
+}
+
+@media(min-width:1024px) {
+    .clear-filters {
+        right: 5%;
+    }
+    .label>h2 {
+        padding-left: 2.5%;
+    }
+}
+
+@media(min-width:1200px) {
+    #deviceh3 {
+        font-size: 30px;
+    }
+}
+
+@media(min-width:1280px) {
+    .devices {
+        padding-left: 100px;
+    }
+    .adddevices {
+        margin-left: -2%;
+    }
+}
+
+@media(min-width:1281px) {
+    .adddevices {
+        margin-left: -2%;
     }
 }

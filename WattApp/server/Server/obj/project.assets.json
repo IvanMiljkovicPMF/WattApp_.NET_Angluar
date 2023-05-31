@@ -676,6 +676,9 @@
           }
         }
       },
+      "Python.Runtime/2.7.9": {
+        "type": "package"
+      },
       "runtime.native.System.Data.SqlClient.sni/4.7.0": {
         "type": "package",
         "dependencies": {
@@ -2109,6 +2112,18 @@
         "portable.bouncycastle.nuspec"
       ]
     },
+    "Python.Runtime/2.7.9": {
+      "sha512": "NBS5t9KJvBVDoAFsVOQ79Ri133Hir8O6sqcEZJufXLVvlReXvzyZKhkcO5fpWcqjj6798qrWd/tO/TXCx2Ga7g==",
+      "type": "package",
+      "path": "python.runtime/2.7.9",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "python.exe",
+        "python.runtime.2.7.9.nupkg.sha512",
+        "python.runtime.nuspec"
+      ]
+    },
     "runtime.native.System.Data.SqlClient.sni/4.7.0": {
       "sha512": "9kyFSIdN3T0qjDQ2R0HRXYIhS3l5psBzQi6qqhdLz+SzFyEy4sVxNOke+yyYv8Cu8rPER12c3RDjLT8wF3WBYQ==",
       "type": "package",
@@ -2924,6 +2939,7 @@
       "Microsoft.EntityFrameworkCore.Sqlite.Core >= 6.0.4",
       "Microsoft.EntityFrameworkCore.Tools >= 6.0.4",
       "Polly >= 7.2.3",
+      "Python.Runtime >= 2.7.9",
       "SQLite >= 3.13.0",
       "Swashbuckle.AspNetCore >= 6.0.4",
       "System.Data.SqlClient >= 4.8.5"
@@ -2957,7 +2973,7 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "C:\\Program Files\\dotnet\\library-packs": {},
+        "C:\\Program Files\\dotnet\\sdk\\7.0.302\\Sdks\\Microsoft.NET.Sdk.Web\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -3018,6 +3034,10 @@
             "target": "Package",
             "version": "[7.2.3, )"
           },
+          "Python.Runtime": {
+            "target": "Package",
+            "version": "[2.7.9, )"
+          },
           "SQLite": {
             "target": "Package",
             "version": "[3.13.0, )"
@@ -3050,7 +3070,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.202\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.302\\RuntimeIdentifierGraph.json"
       }
     }
   }

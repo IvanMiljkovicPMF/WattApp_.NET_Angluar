@@ -2,10 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using Server.Data;
 using Server.DTOs;
-using Server.Models;
-using Server.Models.DropDowns.Devices;
-using Server.Models.DropDowns.Location;
-using System.Collections.Generic;
 using System.Globalization;
 
 namespace Server.Services.Implementations
@@ -156,76 +152,7 @@ namespace Server.Services.Implementations
                 return Math.Round(energyUsage, 2);
             }
         }
-
-        public List<EnergyToday> CalculateSettlementEnergyUsageForToday(long settlementId, long deviceCategoryId)
-        {
-            using (var _connection = _context.Database.GetDbConnection())
-            {
-                _connection.Open();
-                var command = _connection.CreateCommand();
-                command.CommandText = @"
-                                        SELECT
-                                            strftime('%H', deu.StartTime) AS Hour,
-                                            strftime('%d', deu.StartTime) AS Day,
-                                            strftime('%m', deu.StartTime) AS Month,
-                                            strftime('%Y', deu.StartTime) AS Year,
-                                            SUM(CAST((strftime('%s', CASE WHEN deu.EndTime > datetime('now', 'localtime')
-                                                                          THEN datetime('now', 'localtime')
-                                                                          ELSE deu.EndTime
-                                                                     END) - strftime('%s', CASE WHEN deu.StartTime < datetime('now', 'start of day')
-                                                                                               THEN datetime('now', 'start of day')
-                                                                                               ELSE deu.StartTime
-                                                                                          END)) / 3600.0 AS REAL) * dm.EnergyKwh) AS EnergyUsageKwh
-                                        FROM
-                                            DeviceEnergyUsages deu
-                                            JOIN Devices d ON deu.DeviceId = d.Id
-                                            JOIN DeviceModels dm ON d.DeviceModelId = dm.Id
-                                            JOIN DeviceTypes dt ON dm.DeviceTypeId = dt.Id AND dt.CategoryId = @categoryId
-                                            JOIN Users u ON d.UserId = u.Id AND u.SettlementId = @settlementId
-                                        WHERE
-                                            deu.StartTime >= datetime('now', 'start of day')
-                                            AND deu.StartTime <= datetime('now', 'localtime')
-                                        GROUP BY
-                                            strftime('%H', deu.StartTime),
-                                            strftime('%d', deu.StartTime),
-                                            strftime('%m', deu.StartTime),
-                                            strftime('%Y', deu.StartTime)";
-
-                command.Parameters.Add(new SqliteParameter("@categoryId", deviceCategoryId));
-                command.Parameters.Add(new SqliteParameter("@settlementId", settlementId));
-
-                var energyUsages = new List<EnergyToday>();
-
-                using (var reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        DateTimeFormatInfo dateFormatInfo = CultureInfo.CurrentCulture.DateTimeFormat;
-                        string monthName = dateFormatInfo.GetMonthName(int.Parse(reader["Month"].ToString()));
-
-                        var hour = int.Parse(reader["Hour"].ToString());
-                        var day = int.Parse(reader["Day"].ToString());
-                        var month = monthName;
-                        var year = int.Parse(reader["Year"].ToString());
-                        var energyUsage = double.Parse(reader["EnergyUsageKwh"].ToString());
-
-                        var dailyEnergyUsage = new EnergyToday
-                        {
-                            EnergyUsageResult = Math.Round(energyUsage, 2),
-                            Hour = hour,
-                            Day = day,
-                            Month = month,
-                            Year = year
-                        };
-
-                        energyUsages.Add(dailyEnergyUsage);
-                    }
-                }
-
-                return energyUsages;
-            }
-        }
-
+        
         public List<EnergyToday> CalculateEnergyUsageForTodayInCity(long cityId, long deviceCategoryId)
         {
             using (var _connection = _context.Database.GetDbConnection())
@@ -339,26 +266,56 @@ namespace Server.Services.Implementations
 
                 using (var reader = command.ExecuteReader())
                 {
-                    while (reader.Read())
+                    if(reader.HasRows)
                     {
-                        DateTime date = DateTime.ParseExact(reader["Datum"].ToString(), "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
-
-                        var hour = date.Hour;
-                        var day = date.Day;
-                        var month = date.ToString("MMMM");
-                        var year = date.Year;
-                        var energyUsage = double.Parse(reader["EnergyUsageKwh"].ToString());
-
-                        var dailyEnergyUsage = new EnergyToday
+                        while (reader.Read())
                         {
-                            Hour = hour,
-                            Day = day,
-                            Month = month,
-                            Year = year,
-                            EnergyUsageResult = Math.Round(energyUsage, 2)
-                        };
+                            DateTime date = DateTime.ParseExact(reader["Datum"].ToString(), "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
 
-                        energyUsages.Add(dailyEnergyUsage);
+                            var hour = date.Hour;
+                            var day = date.Day;
+                            var month = date.ToString("MMMM");
+                            var year = date.Year;
+                            var energyUsage = double.Parse(reader["EnergyUsageKwh"].ToString());
+
+                            var dailyEnergyUsage = new EnergyToday
+                            {
+                                Hour = hour,
+                                Day = day,
+                                Month = month,
+                                Year = year,
+                                EnergyUsageResult = Math.Round(energyUsage, 2)
+                            };
+
+                            energyUsages.Add(dailyEnergyUsage);
+                        }
+                    }
+                    else
+                    {
+                        var startDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0);
+                        var endDate = DateTime.Now;
+
+                        int itemsAdded = 0;
+                        for (var date = startDate; date < endDate; date = date.AddHours(1))
+                        {
+                            if (itemsAdded >= skipCount && itemsAdded < skipCount + itemsPerPage)
+                            {
+                                var dailyEnergyUsage = new EnergyToday
+                                {
+                                    Hour = date.Hour,
+                                    Day = date.Day,
+                                    Month = date.ToString("MMMM"),
+                                    Year = date.Year,
+                                    EnergyUsageResult = 0.0
+                                };
+
+                                energyUsages.Add(dailyEnergyUsage);
+                            }
+
+                            itemsAdded++;
+                            if (itemsAdded >= skipCount + itemsPerPage)
+                                break;
+                        }
                     }
                 }
 
@@ -408,26 +365,56 @@ namespace Server.Services.Implementations
 
                 using (var reader = command.ExecuteReader())
                 {
-                    while (reader.Read())
+                    if (reader.HasRows)
                     {
-                        DateTime date = DateTime.ParseExact(reader["Datum"].ToString(), "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
-
-                        var hour = date.Hour;
-                        var day = date.Day;
-                        var month = date.ToString("MMMM");
-                        var year = date.Year;
-                        var energyUsage = double.Parse(reader["EnergyUsageKwh"].ToString());
-
-                        var dailyEnergyUsage = new EnergyToday
+                        while (reader.Read())
                         {
-                            Hour = hour,
-                            Day = day,
-                            Month = month,
-                            Year = year,
-                            EnergyUsageResult = Math.Round(energyUsage, 2)
-                        };
+                            DateTime date = DateTime.ParseExact(reader["Datum"].ToString(), "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
 
-                        energyUsages.Add(dailyEnergyUsage);
+                            var hour = date.Hour;
+                            var day = date.Day;
+                            var month = date.ToString("MMMM");
+                            var year = date.Year;
+                            var energyUsage = double.Parse(reader["EnergyUsageKwh"].ToString());
+
+                            var dailyEnergyUsage = new EnergyToday
+                            {
+                                Hour = hour,
+                                Day = day,
+                                Month = month,
+                                Year = year,
+                                EnergyUsageResult = Math.Round(energyUsage, 2)
+                            };
+
+                            energyUsages.Add(dailyEnergyUsage);
+                        }
+                    }
+                    else
+                    {
+                        var startDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0);
+                        var endDate = DateTime.Now;
+
+                        int itemsAdded = 0;
+                        for (var date = startDate; date < endDate; date = date.AddHours(1))
+                        {
+                            if (itemsAdded >= skipCount && itemsAdded < skipCount + itemsPerPage)
+                            {
+                                var dailyEnergyUsage = new EnergyToday
+                                {
+                                    Hour = date.Hour,
+                                    Day = date.Day,
+                                    Month = date.ToString("MMMM"),
+                                    Year = date.Year,
+                                    EnergyUsageResult = 0.0
+                                };
+
+                                energyUsages.Add(dailyEnergyUsage);
+                            }
+
+                            itemsAdded++;
+                            if (itemsAdded >= skipCount + itemsPerPage)
+                                break;
+                        }
                     }
                 }
 
